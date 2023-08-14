@@ -1,9 +1,4 @@
 import React from "react";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import { Button, CardActionArea, CardActions } from "@mui/material";
 
 const ProductCard = ({
   image,
@@ -11,28 +6,33 @@ const ProductCard = ({
   OnClick,
   oldPrice,
   currentPrice,
-  discount,
+  availaBleQTY,
+  measurement
 }) => {
+  const discount = Math.floor(100 - (currentPrice / oldPrice) * 100);
+
   return (
     <div className="bg-white p-[8px] rounded-lg">
-      <img src="./assets/test.png" alt="" />
+      <img src={image} alt="" />
       <div className="p-[16px]">
         <div className="flex justify-between items-center">
-          <div className="text-gray-500">Test Product</div>
+          <div className="text-gray-500">{productName}</div>
           <div className="text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-sm">
-            -12%
+            -{discount}%
           </div>
         </div>
-        <div className="text-gray-800 text-[24px] font-medium">GHC 500</div>
+        <div className="text-gray-800 text-[24px] font-medium">
+          GH₵ {currentPrice}
+        </div>
         <div className="text-gray-500 text-[16px] font-base">
-          10 Bags Available
+          {availaBleQTY} {measurement} Available
         </div>
         <div
-          className="mt-8 capitalize bg-green px-8 py-4 rounded-md text-white w-fit"
+          className="cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
           onClick={OnClick}
         >
           {" "}
-          Add to Cart
+          Get this deal
         </div>
       </div>
     </div>

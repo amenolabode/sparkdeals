@@ -4,6 +4,7 @@ import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { paths } from "./utils/routes";
 import DealsPage from "./deals_page";
+import AdminPage from "./admin_page";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -11,6 +12,7 @@ root.render(
     <BrowserRouter basename="/">
       <Routes>
         <Route path={paths.HOME} element={<DealsPage />} />
+        <Route path={paths.ADMIN} element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

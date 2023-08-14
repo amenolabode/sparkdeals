@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { paths } from "../utils/routes";
 
-export const Header = () => {
+export const Header = ({noInCart}) => {
   const [activePage, setActivePage] = useState("/");
   const navigate = useNavigate();
 
@@ -56,6 +56,15 @@ export const Header = () => {
               }`}
             >
               Home
+            </h2>
+          </Link>
+          <Link to="/" onClick={() => handleLinkClick("/")}>
+            <h2
+              className={`cursor-pointer hover:text-gray-600 flex ${
+                activePage === "/" ? "text-green font-medium" : "text-grey"
+              }`}
+            >
+              Cart <div className="ml-2 px-[6px] text-[10px] h-4 w-4 text-center items-center flex justify-center bg-red-900 text-white rounded-[40px]">{noInCart}</div>
             </h2>
           </Link>
 
