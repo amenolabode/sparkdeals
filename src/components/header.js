@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { paths } from "../utils/routes";
+import { AiOutlineClose } from "react-icons/ai";
+import { Drawer } from "antd";
 
-export const Header = ({noInCart}) => {
+export const Header = ({ noInCart }) => {
   const [activePage, setActivePage] = useState("/");
+  const [openNavBar, setOpenNavBar] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +21,10 @@ export const Header = ({noInCart}) => {
   const MobileSideNavItems = () => {
     return (
       <div className="flex justify-start  w-full h-full pl-[20px] pr-[100px] py-8 bg-black ">
-        <div className="flex justify-end"></div>
+        <div className="flex justify-end"><AiOutlineClose
+						className="text-2xl font-bold text-white"
+						onClick={() => setOpenNavBar(false)}
+					/></div>
         <div className="flex-col items-center justify-center w-full mt-24 space-y-8 text-black">
           <h1 className="mb-4 text-[20px] font-semibold ">Home</h1>
         </div>
@@ -30,14 +35,14 @@ export const Header = ({noInCart}) => {
   return (
     <div className="fixed items-center top-0 z-50 flex flex-col w-full h-auto border-b border-[#FAFAFA]/[.20]">
       <div className="flex justify-between w-full px-[64px] py-[16px] bg-white max-w-[2880px] items-center">
-        {/* <Drawer
-            // open={openNavBar}
-            anchor={"left"}
-            className="w-[200px]"
-            // onClose={() => setOpenNavBar(false)}
-          >
-            {MobileSideNavItems()}
-          </Drawer> */}
+        <Drawer
+          open={openNavBar}
+          anchor={"left"}
+          className="w-[200px]"
+          onClose={() => setOpenNavBar(false)}
+        >
+          {MobileSideNavItems()}
+        </Drawer>
 
         <img
           src="./assets/logo.png"
@@ -64,7 +69,10 @@ export const Header = ({noInCart}) => {
                 activePage === "/" ? "text-green font-medium" : "text-grey"
               }`}
             >
-              Cart <div className="ml-2 px-[6px] text-[10px] h-4 w-4 text-center items-center flex justify-center bg-red-900 text-white rounded-[40px]">{noInCart}</div>
+              Cart{" "}
+              <div className="ml-2 px-[6px] text-[10px] h-4 w-4 text-center items-center flex justify-center bg-red-900 text-white rounded-[40px]">
+                {noInCart}
+              </div>
             </h2>
           </Link>
 

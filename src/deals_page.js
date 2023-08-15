@@ -92,10 +92,6 @@ const DealsPage = () => {
       });
 
       setAllDocs(documents);
-
-      //   querySnapshot.forEach((doc) => {
-      //     console.log(doc.id, " => ", doc.data());
-      //   });
     };
 
     fetchData();
