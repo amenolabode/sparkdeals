@@ -4,11 +4,18 @@ import Input from "antd/es/input/Input";
 import { addDoc } from "firebase/firestore";
 import { collection, getDocs } from "firebase/firestore";
 import { db, storage } from "./utils/init_firebase";
-import { ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { Modal } from "antd";
 import { FaEllipsisV } from "react-icons/fa";
 
+const initialState = {
+  productName: "",
+      oldPrice: "",
+      currentPrice: 0,
+      availableQTY: 0,
+      measurement: "",
+}
 const AdminPage = () => {
   const [productName, setProductName] = useState("");
   const [oldPrice, setOldPrice] = useState(0);
@@ -18,13 +25,19 @@ const AdminPage = () => {
   const [image, setImage] = useState(null);
   const [newDeal, setNewdeal] = useState(false);
   const [allDocs, setAllDocs] = useState([]);
+  const [data, setData] = useState(initialState);
 
   const handleFile = () => {
+    const uploadTask = uploadBytes(imageRef, image);
     if (image == null) return;
     const imageRef = ref(storage, `/images/${image.name + v4()}`);
-    uploadBytes(imageRef, image).then(() => {
-      alert("UPloaded");
-    });
+    uploadBytes(imageRef, image).then(
+      getDownloadURL(uploadBytes(imageRef, image).querySnapshot.ref).then(
+        (downloadURL) => {
+          setData((prev) => ({ ...prev, img: downloadURL }));
+        }
+      )
+    );
   };
 
   const handleOk = () => {
