@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { paths } from "./utils/routes";
 import DealsPage from "./deals_page";
 import AdminPage from "./admin_page";
-require("dotenv").config();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/product_display";
-import { productItems } from "./utils/dummy_product_data";
 import { Modal, Input } from "antd";
 import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { collection, getDocs } from "firebase/firestore";
