@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/product_display";
 import { productItems } from "./utils/dummy_product_data";
 import { Modal, Input } from "antd";
 import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
+import { collection, getDocs } from "firebase/firestore";
+import { db, storage } from "./utils/init_firebase";
 
 const DealsPage = () => {
   const [openCheckOut, setOpenCheckOut] = useState(false);
@@ -13,14 +15,8 @@ const DealsPage = () => {
   const [userPhone, setPhone] = useState("");
   const [userEmail, setEmail] = useState("");
   const [userAddress, setAddress] = useState("");
+  const [allDocs, setAllDocs] = useState([]);
 
-  // const handleProductClick = (product) => {
-  //   setSelectedProducts((prevSelectedProducts) => [
-  //     ...prevSelectedProducts,
-  //     { ...product, value: 1 },
-  //   ]);
-  //   setOpenCheckOut(true);
-  // };
   const handleProductClick = (product) => {
     const productExists = selectedProducts.some(
       (selectedProduct) => selectedProduct.id === product.id
@@ -86,18 +82,38 @@ const DealsPage = () => {
     });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const dealsRef = collection(db, "deals");
+      const querySnapshot = await getDocs(dealsRef);
+
+      const documents = [];
+      querySnapshot.forEach((doc) => {
+        documents.push({ id: doc.id, ...doc.data() });
+      });
+
+      setAllDocs(documents);
+
+      //   querySnapshot.forEach((doc) => {
+      //     console.log(doc.id, " => ", doc.data());
+      //   });
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div>
       <Header noInCart={selectedProducts.length} />
       <div className="m-[64px] grid grid-cols-3 gap-8 mt-24">
-        {productItems.map((product, index) => (
+        {allDocs.map((product, index) => (
           <ProductCard
             key={index}
             image={product.image}
             productName={product.productName}
             oldPrice={product.oldPrice}
             currentPrice={product.currentPrice}
-            availaBleQTY={product.availaBleQTY}
+            availaBleQTY={product.availableQTY}
             measurement={product.measurement}
             OnClick={() => {
               handleProductClick(product);
