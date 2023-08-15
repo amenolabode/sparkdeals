@@ -7,12 +7,13 @@ const ProductCard = ({
   oldPrice,
   currentPrice,
   availaBleQTY,
-  measurement
+  measurement,
+  classExtra
 }) => {
   const discount = Math.floor(100 - (currentPrice / oldPrice) * 100);
 
   return (
-    <div className="bg-white p-[8px] rounded-lg">
+    <div className={`bg-white p-[8px] rounded-lg ${classExtra}`}>
       <img src={image} alt="" />
       <div className="p-[16px]">
         <div className="flex justify-between items-center">
@@ -28,7 +29,7 @@ const ProductCard = ({
           {availaBleQTY} {measurement} Available
         </div>
         <div
-          className="cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
+          className="cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-full text-center md:w-fit"
           onClick={OnClick}
         >
           {" "}

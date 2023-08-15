@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineClose } from "react-icons/ai";
+import { HiMenu } from "react-icons/hi";
 import { Drawer } from "antd";
 
 export const Header = ({ noInCart }) => {
@@ -20,11 +21,13 @@ export const Header = ({ noInCart }) => {
 
   const MobileSideNavItems = () => {
     return (
-      <div className="flex justify-start  w-full h-full pl-[20px] pr-[100px] py-8 bg-black ">
-        <div className="flex justify-end"><AiOutlineClose
-						className="text-2xl font-bold text-white"
-						onClick={() => setOpenNavBar(false)}
-					/></div>
+      <div className="flex justify-start text-black  w-full h-full pl-[20px] pr-[100px] py-8">
+        <div className="flex justify-end">
+          <AiOutlineClose
+            className="text-2xl font-bold text-white"
+            onClick={() => setOpenNavBar(false)}
+          />
+        </div>
         <div className="flex-col items-center justify-center w-full mt-24 space-y-8 text-black">
           <h1 className="mb-4 text-[20px] font-semibold ">Home</h1>
         </div>
@@ -33,21 +36,23 @@ export const Header = ({ noInCart }) => {
   };
 
   return (
-    <div className="fixed items-center top-0 z-50 flex flex-col w-full h-auto border-b border-[#FAFAFA]/[.20]">
-      <div className="flex justify-between w-full px-[64px] py-[16px] bg-white max-w-[2880px] items-center">
+    <div className="md:fixed items-center top-0 z-50 flex flex-col w-full h-auto border-b border-[#FAFAFA]/[.20]">
+      <div className="flex md:justify-between w-full md:px-[64px] h-[88px] py-[16px] bg-white max-w-[2880px] items-center">
+        <HiMenu
+          className="text-xl md:hidden ml-[16px]"
+          onClick={() => setOpenNavBar(true)}
+        />
         <Drawer
           open={openNavBar}
           anchor={"left"}
-          className="w-[200px]"
           onClose={() => setOpenNavBar(false)}
         >
           {MobileSideNavItems()}
         </Drawer>
-
         <img
           src="./assets/logo.png"
           alt=""
-          className="cursor-pointer h-[32px]"
+          className="ml-4 md:ml-0 cursor-pointer h-[32px]"
           onClick={() => {
             handleLinkClick("/");
           }}
@@ -75,16 +80,6 @@ export const Header = ({ noInCart }) => {
               </div>
             </h2>
           </Link>
-
-          <div className="border bg-white h-6 opacity-25"></div>
-          {/* <div
-            className="px-[18px] py-[12px] bg-gold font-[500] rounded-[8px] cursor-pointer"
-            onClick={() => {
-              navigate(paths.TICKET);
-            }}
-          >
-            Buy tickets
-          </div> */}
         </div>
       </div>
     </div>

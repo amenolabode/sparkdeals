@@ -98,7 +98,7 @@ const DealsPage = () => {
   }, []);
 
   return (
-    <div>
+    <div className="pb-24 md:pb-8">
       <Header noInCart={selectedProducts.length} />
       {allDocs.length === 0 && (
         <div className="flex px-6 py-2 mb-8 space-x-4 animate-pulse mt-24">
@@ -121,7 +121,7 @@ const DealsPage = () => {
           </div>
         </div>
       )}
-      <div className="m-[64px] grid grid-cols-3 gap-8 mt-24">
+      <div className="mx-[16px] b-[16px] md:m-[64px] md:grid grid-cols-3 gap-8 mt-24 ">
         {allDocs.map((product, index) => (
           <ProductCard
             key={index}
@@ -132,6 +132,7 @@ const DealsPage = () => {
             currentPrice={product.currentPrice}
             availaBleQTY={product.availableQTY}
             measurement={product.measurement}
+            classExtra={"mb-8"}
             OnClick={() => {
               handleProductClick(product);
             }}
