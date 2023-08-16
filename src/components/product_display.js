@@ -1,4 +1,5 @@
 import React from "react";
+import CountdownTimer from "./countdown_time";
 
 const ProductCard = ({
   image,
@@ -8,23 +9,28 @@ const ProductCard = ({
   currentPrice,
   availaBleQTY,
   measurement,
-  classExtra
+  classExtra,
+  endDate,
 }) => {
   const discount = Math.floor(100 - (currentPrice / oldPrice) * 100);
 
   return (
-    <div className={`bg-white h-96 md:h-auto  p-[8px] rounded-lg ${classExtra}`}>
-     <div className="h-[50%] md:h-[400px] mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-md">
+    <div
+      className={`bg-white h-160 md:h-auto p-[8px] rounded-lg ${classExtra}`}
+    >
+      <div className="h-[37%] md:h-[400px] mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-md">
         <img src={image} alt="" className="h-full w-full object-cover " />
       </div>
       <div className="p-[4px] mt-4 md:mt-0 md:p-[16px]">
         <div className="md:flex justify-between items-center">
-        <div className="md:hidden mb-2 w-fit text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-sm">
-            -{discount}%
+          <div className="md:hidden mb-2 w-fit text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-sm">
+            {discount}% off
           </div>
-          <div className="text-gray-500 text-[14px] md:text-[16px]">{productName}</div>
-          <div className="hidden w-fit text-[14px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-sm">
-            -{discount}%
+          <div className="text-gray-500 text-[14px] md:text-[16px]">
+            {productName}
+          </div>
+          <div className="hidden md:block w-fit text-[14px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-sm">
+            {discount}% off
           </div>
         </div>
         <div className="text-gray-800 text-[18px] md:text-[24px] font-medium">
@@ -39,6 +45,12 @@ const ProductCard = ({
         >
           {" "}
           Get this deal
+        </div>
+
+        <div className="text-[13px] mt-4">
+          {" "}
+          Deal Expires in{" "}
+          <CountdownTimer className="text-red-700" endDate={endDate} />
         </div>
       </div>
     </div>

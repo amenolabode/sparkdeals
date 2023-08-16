@@ -202,6 +202,7 @@ const DealsPage = () => {
             currentPrice={product.currentPrice}
             availaBleQTY={product.availableQTY}
             measurement={product.measurement}
+            endDate={product.expiryDate}
             classExtra={"mb-2 md:mb-8"}
             OnClick={() => {
               handleProductClick(product);

@@ -6,7 +6,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db, storage } from "./utils/init_firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
-import { Modal, Drawer } from "antd";
+import { Modal, Drawer, DatePicker } from "antd";
 import { FaEllipsisV } from "react-icons/fa";
 
 const AdminPage = () => {
@@ -22,6 +22,13 @@ const AdminPage = () => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [useDrawer, setUseDrawer] = useState(false);
   const [activePage, setActivePage] = useState("deals");
+  const [expiryDate, setExpiryDate] = useState("deals");
+
+
+  const handleDateChange = (dateString) => {
+    setExpiryDate(dateString); 
+  };
+  
 
   const handleOk = () => {
     setNewdeal(false);
@@ -88,6 +95,7 @@ const AdminPage = () => {
           imageURL,
           productName,
           oldPrice,
+          expiryDate,
           currentPrice: newPrice,
           availableQTY: quantity,
           measurement: unit,
@@ -130,7 +138,7 @@ const AdminPage = () => {
     newPrice !== 0 &&
     quantity !== 0 &&
     unit !== "" &&
-    image !== null;
+    image !== null && expiryDate !== "";
 
   return (
     <div>
@@ -338,7 +346,9 @@ const AdminPage = () => {
                     {order.selectedProducts.map((product) => (
                       <div className="flex items-center">
                         <div className="mr-4">{product.productName}</div>
-                        <div className="text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-md">{product.value} {product.measurement}</div>
+                        <div className="text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-md">
+                          {product.value} {product.measurement}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -349,7 +359,7 @@ const AdminPage = () => {
                     </p>
                     <div className="mx-2 rounded-[12px] h-1 w-1 bg-gray-300"></div>
                     <p className="text-[14px] text-gray-500">
-                    {order.userPhone}
+                      {order.userPhone}
                     </p>
                   </div>
                 </div>
@@ -446,6 +456,15 @@ const AdminPage = () => {
                   value={unit}
                   required={true}
                   onChange={(e) => setUnit(e.target.value)}
+                />
+              </div>
+              <div className="mt-4">
+                <div className="mb-1">
+                  <label className="text-gray-500"> Deal Expiry Date</label>
+                </div>
+                <DatePicker
+                  className="w-full"
+                  onChange={(date, dateString) => handleDateChange(dateString)}
                 />
               </div>
 
