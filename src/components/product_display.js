@@ -13,7 +13,7 @@ const ProductCard = ({
   const discount = Math.floor(100 - (currentPrice / oldPrice) * 100);
 
   return (
-    <div className={`bg-white h-96 p-[8px] rounded-lg ${classExtra}`}>
+    <div className={`bg-white h-96 md:h-auto p-[8px] rounded-lg ${classExtra}`}>
      <div className="h-[50%] md:h-[70%] mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-md">
         <img src={image} alt="" className="h-full object-cover " />
       </div>
