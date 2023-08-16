@@ -13,23 +13,28 @@ const ProductCard = ({
   const discount = Math.floor(100 - (currentPrice / oldPrice) * 100);
 
   return (
-    <div className={`bg-white p-[8px] rounded-lg ${classExtra}`}>
-      <img src={image} alt="" />
-      <div className="p-[16px]">
-        <div className="flex justify-between items-center">
-          <div className="text-gray-500">{productName}</div>
-          <div className="text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-sm">
+    <div className={`bg-white h-96 p-[8px] rounded-lg ${classExtra}`}>
+     <div className="h-[50%] md:h-[70%] mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-md">
+        <img src={image} alt="" className="h-full object-cover " />
+      </div>
+      <div className="p-[4px] mt-4 md:mt-0 md:p-[16px]">
+        <div className="md:flex justify-between items-center">
+        <div className="md:hidden mb-2 w-fit text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-sm">
+            -{discount}%
+          </div>
+          <div className="text-gray-500 text-[14px] md:text-[16px]">{productName}</div>
+          <div className="hidden w-fit text-[14px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-sm">
             -{discount}%
           </div>
         </div>
-        <div className="text-gray-800 text-[24px] font-medium">
+        <div className="text-gray-800 text-[18px] md:text-[24px] font-medium">
           GH₵ {currentPrice}
         </div>
-        <div className="text-gray-500 text-[16px] font-base">
+        <div className="text-[14px] md:text-[16px] text-gray-500 font-base">
           {availaBleQTY} {measurement} Available
         </div>
         <div
-          className="cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-full text-center md:w-fit"
+          className="cursor-pointer mt-4 md:mt-8 capitalize bg-green hover:bg-[#0f5c2e] px-4 md:px-8 py-3 md:py-4 rounded-md text-white w-full text-center md:w-fit"
           onClick={OnClick}
         >
           {" "}

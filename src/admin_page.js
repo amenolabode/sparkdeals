@@ -11,11 +11,11 @@ import { FaEllipsisV } from "react-icons/fa";
 
 const initialState = {
   productName: "",
-      oldPrice: "",
-      currentPrice: 0,
-      availableQTY: 0,
-      measurement: "",
-}
+  oldPrice: "",
+  currentPrice: 0,
+  availableQTY: 0,
+  measurement: "",
+};
 const AdminPage = () => {
   const [productName, setProductName] = useState("");
   const [oldPrice, setOldPrice] = useState(0);
@@ -25,20 +25,7 @@ const AdminPage = () => {
   const [image, setImage] = useState(null);
   const [newDeal, setNewdeal] = useState(false);
   const [allDocs, setAllDocs] = useState([]);
-  const [data, setData] = useState(initialState);
-
-  const handleFile = () => {
-    const uploadTask = uploadBytes(imageRef, image);
-    if (image == null) return;
-    const imageRef = ref(storage, `/images/${image.name + v4()}`);
-    uploadBytes(imageRef, image).then(
-      getDownloadURL(uploadBytes(imageRef, image).querySnapshot.ref).then(
-        (downloadURL) => {
-          setData((prev) => ({ ...prev, img: downloadURL }));
-        }
-      )
-    );
-  };
+  const [imageURL, setImageURL] = useState("");
 
   const handleOk = () => {
     setNewdeal(false);
@@ -52,38 +39,73 @@ const AdminPage = () => {
     const fetchData = async () => {
       const dealsRef = collection(db, "deals");
       const querySnapshot = await getDocs(dealsRef);
-
       const documents = [];
       querySnapshot.forEach((doc) => {
         documents.push({ id: doc.id, ...doc.data() });
       });
-
       setAllDocs(documents);
-
-      //   querySnapshot.forEach((doc) => {
-      //     console.log(doc.id, " => ", doc.data());
-      //   });
     };
-
     fetchData();
   }, [newDeal]);
 
-  const handleSubmit = (event) => {
-    handleFile();
-    event.preventDefault();
-
-    const collectionRef = collection(db, "deals");
-    addDoc(collectionRef, {
-      productName,
-      oldPrice,
-      currentPrice: newPrice,
-      availableQTY: quantity,
-      measurement: unit,
-    }).then((response) => {
-      console.log(response);
+  const handleFile = () => {
+    return new Promise((resolve, reject) => {
+      if (image == null) {
+        reject("No image to upload");
+        return;
+      }
+      const imageRef = ref(storage, `/images/${image.name + v4()}`);
+      uploadBytes(imageRef, image)
+        .then(() => {
+          getDownloadURL(imageRef)
+            .then((downloadURL) => {
+              resolve(downloadURL);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
+  };
+
+  const handleSubmit = () => {
+    handleFile()
+      .then((imageURL) => {
+        const collectionRef = collection(db, "deals");
+        addDoc(collectionRef, {
+          imageURL,
+          productName,
+          oldPrice,
+          currentPrice: newPrice,
+          availableQTY: quantity,
+          measurement: unit,
+        }).then(() => {
+          setProductName("");
+          setOldPrice(0);
+          setNewPrice(0);
+          setQuantity(0);
+          setUnit("");
+          setImage(null);
+          alert("Deal Added Successfully");
+        });
+      })
+      .catch((error) => {
+        // console.error("Error handling file:", error);
+      });
+
     setNewdeal(false);
   };
+
+  const isAdditionValid =
+    productName !== "" &&
+    oldPrice !== 0 &&
+    newPrice !== 0 &&
+    quantity !== 0 &&
+    unit !== "" &&
+    image !== null;
 
   return (
     <div>
@@ -261,8 +283,12 @@ const AdminPage = () => {
               </div>
 
               <div
-                className="text-[16px] w-full mt-8 text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
-                onClick={handleSubmit}
+                className={`${
+                  isAdditionValid
+                    ? "bg-green hover:bg-[#0f5c2e] text-white"
+                    : "bg-gray-200 text-gray-500"
+                } text-[16px] w-full mt-8 text-center cursor-pointer capitalize  px-8 py-4 rounded-md w-fit`}
+                onClick={isAdditionValid && handleSubmit}
               >
                 {" "}
                 Add Deal
