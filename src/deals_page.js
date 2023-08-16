@@ -23,6 +23,8 @@ const DealsPage = () => {
   const [useDrawer, setUseDrawer] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [paid, setPaid] = useState(false);
+  const [delivered, setDelivered] = useState(false);
 
   const isCheckOutValid =
     userAddress !== "" &&
@@ -122,6 +124,8 @@ const DealsPage = () => {
         userEmail,
         userPhone,
         userAddress,
+        paid,
+        delivered
       });
 
       setSelectedProducts([]);
