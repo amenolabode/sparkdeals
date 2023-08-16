@@ -109,7 +109,7 @@ const DealsPage = () => {
       userPhone,
       userAddress,
     }).then(() => {
-      submitEmailHandler();
+      // submitEmailHandler();
       setSelectedProducts([]);
       setAddress("");
       setEmail("");

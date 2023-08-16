@@ -7,7 +7,13 @@ import { db, storage } from "./utils/init_firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { Modal, Drawer, DatePicker } from "antd";
-import { FaEllipsisV, FaExclamationCircle, FaPlus } from "react-icons/fa";
+import {
+  FaChevronCircleDown,
+  FaChevronCircleUp,
+  FaEllipsisV,
+  FaExclamationCircle,
+  FaPlus,
+} from "react-icons/fa";
 
 const AdminPage = () => {
   const [productName, setProductName] = useState("");
@@ -28,6 +34,7 @@ const AdminPage = () => {
   const [menuToggle, setMenuToggle] = useState("");
   const [modalVisible, setModalVisible] = useState("");
   const [modalData, setModalData] = useState("");
+  const [showDetails, setShowDetails] = useState(false);
 
   const handleSetMenuToggle = (value) => {
     if (menuToggle === value) {
@@ -44,7 +51,6 @@ const AdminPage = () => {
 
   const handleStartDateChange = (dateString) => {
     setStartDate(dateString);
-
   };
   const handleEndDateChange = (dateString) => {
     setExpiryDate(dateString);
@@ -608,28 +614,62 @@ const AdminPage = () => {
           </div>
 
           <div className={`${!useDrawer && "hidden"}`}>
-            {orderDocs.map((order) => (
-              <div className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-2">
+            {orderDocs.map((order, index) => (
+              <div
+                className="m-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-3"
+                key={order.id}
+              >
                 <div className="w-full">
-                  <div className="w-full text-[16px] font-medium mb-1">
+                  <div className="items-center ">
+                    <div className="text-[14px] text-green border-b pb-2">
+                      New Order for
+                    </div>
                     {order.selectedProducts.map((product) => (
-                      <div className="flex items-center">
-                        <div className="mr-4">{product.productName}</div>
-                        <div className="text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-md">
-                          {product.value} {product.measurement}
-                        </div>
+                      <div
+                        className="text-[16px] flex justify-between mt-2"
+                        key={product.id}
+                      >
+                        <p className="mt-1">
+                          {product.value} {product.measurement} of{" "}
+                          {product.productName}
+                        </p>
+                        <p>GH₵ {product.currentPrice * product.value}</p>
                       </div>
                     ))}
-                  </div>
 
-                  <div className="flex items-center">
-                    <p className="text-[14px] text-gray-500">
-                      {order.userName}
-                    </p>
-                    <div className="mx-2 rounded-[12px] h-1 w-1 bg-gray-300"></div>
-                    <p className="text-[14px] text-gray-500">
-                      {order.userPhone}
-                    </p>
+                    <div
+                      className="mt-4 text-[14px] text-green border-b py-3 flex justify-between items-center"
+                      onClick={() => {
+                        setShowDetails((prevState) => ({
+                          ...prevState,
+                          [index]: !prevState[index],
+                        }));
+                      }}
+                    >
+                      <p>User Details</p>
+                      {showDetails ? (
+                        <FaChevronCircleUp />
+                      ) : (
+                        <FaChevronCircleDown />
+                      )}
+                    </div>
+
+                    {showDetails[index] && (
+                      <div className="mt-2">
+                        <p className="mt-1 text-[14px] text-gray-500">
+                          {order.userName}
+                        </p>
+                        <p className="mt-1 text-[14px] text-gray-500">
+                          {order.userPhone}
+                        </p>
+                        <p className="mt-1 text-[14px] text-gray-500">
+                          {order.userEmail}
+                        </p>
+                        <p className="mt-1 text-[14px] text-gray-500">
+                          {order.userAddress}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -711,7 +751,7 @@ const AdminPage = () => {
           width={240}
         >
           {
-            <div className ="w-full text-center place-items-center">
+            <div className="w-full text-center place-items-center">
               <FaExclamationCircle
                 size={32}
                 className="text-[#E71D36] w-full mt-8"
