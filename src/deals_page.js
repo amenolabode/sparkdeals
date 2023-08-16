@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/product_display";
 import { Modal, Input, Drawer } from "antd";
-import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
+import { FaCheckCircle, FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from "./utils/init_firebase";
 import emailjs from "@emailjs/browser";
 import Lottie from "lottie-react";
 import animationData from "./assets/animation_lldyxh5j.json";
+import animationData2 from "./assets/animation_lle1e0mt.json";
 
 const DealsPage = () => {
   const [openCheckOut, setOpenCheckOut] = useState(false);
@@ -20,6 +21,9 @@ const DealsPage = () => {
   const [allDocs, setAllDocs] = useState([]);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [useDrawer, setUseDrawer] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
   const isCheckOutValid =
     userAddress !== "" &&
     userName !== "" &&
@@ -105,26 +109,33 @@ const DealsPage = () => {
     0
   );
 
-  const handleProcessOrder = (event) => {
-    const collectionRef = collection(db, "orders");
-    addDoc(collectionRef, {
-      totalValue,
-      selectedProducts,
-      userName,
-      userEmail,
-      userPhone,
-      userAddress,
-    }).then(() => {
-      // submitEmailHandler();
+  const handleProcessOrder = async () => {
+    try {
+      
+      setLoading(true);
+
+      const collectionRef = collection(db, "orders");
+      await addDoc(collectionRef, {
+        totalValue,
+        selectedProducts,
+        userName,
+        userEmail,
+        userPhone,
+        userAddress,
+      });
+
       setSelectedProducts([]);
       setAddress("");
       setEmail("");
       setName("");
       setPhone("");
-      alert("Order Placed Successfully");
-    });
-    setUseDrawer(false);
-    setOpenCheckOut(false);
+      setOpenCheckOut(false);
+      setSuccess(true);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error placing order:", error);
+      setLoading(false);
+    }
   };
 
   const handleChange = (e, index) => {
@@ -229,7 +240,9 @@ const DealsPage = () => {
           className="cursor-pointer text-green mt-2 w-full text-center"
           onClick={handleOk}
         >
-          {selectedProducts.length === 0 ? "Add an item to cart" : "Add More Items"}
+          {selectedProducts.length === 0
+            ? "Add an item to cart"
+            : "Add More Items"}
         </div>
         <div
           className={`${
@@ -334,7 +347,7 @@ const DealsPage = () => {
           }}
         >
           {" "}
-          Checkout
+          {loading ? "Sending Order..." : "Checkout"}
         </div>
       </div>
     );
@@ -431,6 +444,39 @@ const DealsPage = () => {
         >
           {modalView === "cart" && displayCart()}
           {modalView === "checkOut" && displayCheckout()}
+        </Modal>
+      )}
+
+      {success && (
+        <Modal
+          open={success}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          centered={true}
+          footer={false}
+          closable={true}
+          width={360}
+        >
+          <div className="items-center flex flex-col">
+          <div className="w-full justify-center text-center place-items-center">
+            <Lottie className="h-32" animationData={animationData2} />
+            <div className="flex flex-col text-center"><div className="text-center mt-4 text-[24px] font-medium boder-b leading-tight">
+              Order Placed Successfully
+            </div>
+            <p className="text-[14px] w-[75%] mt-2 m-auto text-gray-600 text-center">
+              Our team will reach out to you in order to finalize your order
+            </p></div>
+          </div>
+
+          <div
+            onClick={() => {
+              setSuccess(false);
+            }}
+            className="mt-8 mb-4 text-green cursor-pointer"
+          >
+            Close
+          </div>
+          </div>
         </Modal>
       )}
     </div>
