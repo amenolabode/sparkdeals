@@ -4,7 +4,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { HiMenu } from "react-icons/hi";
 import { Drawer } from "antd";
 
-export const Header = ({ noInCart }) => {
+export const Header = ({ noInCart, handleOpenCart }) => {
   const [activePage, setActivePage] = useState("/");
   const [openNavBar, setOpenNavBar] = useState(false);
   const navigate = useNavigate();
@@ -50,28 +50,30 @@ export const Header = ({ noInCart }) => {
         >
           {MobileSideNavItems()}
         </Drawer>
-        <img
-          src="./assets/logo.png"
-          alt=""
-          className="ml-4 md:ml-0 cursor-pointer h-[32px]"
-          onClick={() => {
-            handleLinkClick("/");
-          }}
-        />
+        <div className="w-full">
+          <img
+            src="./assets/logo.png"
+            alt=""
+            className="ml-4 md:ml-0 cursor-pointer h-[32px]"
+            onClick={() => {
+              handleLinkClick("/");
+            }}
+          />
+        </div>
 
-        <div className="md:flex hidden text-black items-center space-x-8 justify-end text-[16px] font-[400]">
+        <div className="flex text-black items-center space-x-8 justify-end text-[16px] font-[400]">
           <Link to="/" onClick={() => handleLinkClick("/")}>
             <h2
-              className={`cursor-pointer hover:text-gray-600 ${
+              className={`hidden md:block cursor-pointer hover:text-gray-600 ${
                 activePage === "/" ? "text-green font-medium" : "text-grey"
               }`}
             >
               Home
             </h2>
           </Link>
-          <Link to="/" onClick={() => handleLinkClick("/")}>
+          <Link to="/" onClick={handleOpenCart}>
             <h2
-              className={`cursor-pointer hover:text-gray-600 flex ${
+              className={`mr-[16px] md:mr-0 cursor-pointer hover:text-gray-600 flex ${
                 activePage === "/" ? "text-green font-medium" : "text-grey"
               }`}
             >

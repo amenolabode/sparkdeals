@@ -6,6 +6,8 @@ import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from "./utils/init_firebase";
 import emailjs from "@emailjs/browser";
+import Lottie from "lottie-react";
+import animationData from "./assets/animation_lldyxh5j.json";
 
 const DealsPage = () => {
   const [openCheckOut, setOpenCheckOut] = useState(false);
@@ -24,6 +26,10 @@ const DealsPage = () => {
     userPhone !== "" &&
     selectedProducts.length !== 0;
 
+  const handleOpenCart = () => {
+    setOpenCheckOut(true);
+  };
+
   const handleProductClick = (product) => {
     const productExists = selectedProducts.some(
       (selectedProduct) => selectedProduct.id === product.id
@@ -39,7 +45,7 @@ const DealsPage = () => {
     setOpenCheckOut(true);
   };
 
-  const form = useRef()
+  const form = useRef();
   const submitEmailHandler = () => {
     emailjs
       .sendForm(
@@ -162,9 +168,184 @@ const DealsPage = () => {
     };
   }, [screenWidth]);
 
+  const displayCart = () => {
+    return (
+      <div>
+        {selectedProducts.length === 0 && (
+          <div className="text-center">
+            {" "}
+            <div className="my-4">Oops, Your Cart is empty </div>
+            <Lottie className="h-48" animationData={animationData} />
+          </div>
+        )}
+        <div className="pb-4 border-b">
+          {selectedProducts.map((product, index) => (
+            <div
+              key={index}
+              className="flex items-center mt-3 bg-gray-100 rounded-lg px-4 py-2"
+            >
+              <div className="w-full">
+                <div className="w-full text-[16px] font-medium ">
+                  {product.productName}
+                </div>
+                <p className="text-[14px] text-gray-500">
+                  GH₵ {product.currentPrice * product.value}
+                </p>
+              </div>
+              <div className="flex items-center mx-6 justify-evenly">
+                <FaMinusCircle
+                  size={32}
+                  onClick={() => minusItem(index)}
+                  className="cursor-pointer"
+                />
+                <div className="w-full place-content-center">
+                  <input
+                    type="number"
+                    value={product.value}
+                    onChange={(e) => handleChange(e, index)}
+                    placeholder="0"
+                    className="bg-gray-100 w-full text-center rounded-md focus:outline-none focus:shadow-outline-blue placeholder-black text-[18px]"
+                  />
+                  {/* {product.measurement} */}
+                </div>
+                <FaPlusCircle
+                  size={32}
+                  onClick={() => addItem(index)}
+                  className="cursor-pointer"
+                />
+              </div>
+              <p
+                className="cursor-pointer text-red-900 hover:text-red-500 text-[12px]"
+                onClick={() => {
+                  handleRemoveProduct(product.id);
+                }}
+              >
+                remove
+              </p>
+            </div>
+          ))}
+        </div>
+        <div
+          className="cursor-pointer text-green mt-2 w-full text-center"
+          onClick={handleOk}
+        >
+          {selectedProducts.length === 0 ? "Add an item to cart" : "Add More Items"}
+        </div>
+        <div
+          className={`${
+            selectedProducts.length === 0 && "hidden"
+          } text-[16px] w-full text-center cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] text-whitepx-8 py-4 rounded-md text-white`}
+          onClick={() => {
+            selectedProducts.length !== 0
+              ? setModalView("checkOut")
+              : alert("Please add an item to continue");
+          }}
+        >
+          {" "}
+          Proceed to Checkout
+        </div>
+      </div>
+    );
+  };
+
+  const displayCheckout = () => {
+    return (
+      <div ref={form} className="">
+        {selectedProducts.length > 0 && (
+          <div>
+            {selectedProducts.map((product, index) => (
+              <div
+                key={index}
+                className="flex text-gray-600 justify-between items-center mb-4 border-b pb-4"
+              >
+                <p>{product.productName}</p>
+                <p>
+                  {product.value} {product.measurement}
+                </p>
+                <p>GH₵ {product.currentPrice * product.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="font-medium flex justify-between items-center mb-4 border-b pb-4">
+          <p>Total</p>
+
+          <p>GH₵ {totalValue}</p>
+        </div>
+
+        <h2 className="mt-8 font-medium">Please Enter your Details</h2>
+        <div className="mt-4">
+          <div className="mb-1">
+            <label className="text-gray-500"> Name</label>
+          </div>
+          <Input
+            className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+            placeholder="Please enter your name"
+            value={userName}
+            required={true}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div className="mt-4">
+          <div className="mb-1">
+            <label className="text-gray-500"> Phone Number </label>
+          </div>
+          <Input
+            className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+            placeholder="Please enter your phone number"
+            value={userPhone}
+            required={true}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+        <div className="mt-4">
+          <div className="mb-1">
+            <label className="text-gray-500"> Email Address </label>
+          </div>
+          <Input
+            className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+            placeholder="Please enter your email"
+            value={userEmail}
+            required={true}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="mt-4">
+          <div className="mb-1">
+            <label className="text-gray-500"> House Address </label>
+          </div>
+          <Input
+            className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+            placeholder="Please enter your address"
+            value={userAddress}
+            required={true}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+
+        <div
+          className={`${
+            isCheckOutValid
+              ? "bg-green hover:bg-[#0f5c2e] text-white"
+              : "bg-gray-200 text-gray-500"
+          } text-[16px] w-full text-center cursor-pointer mt-8 capitalize px-8 py-4 rounded-md`}
+          onClick={() => {
+            isCheckOutValid && handleProcessOrder();
+          }}
+        >
+          {" "}
+          Checkout
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="pb-24 md:pb-8">
-      <Header noInCart={selectedProducts.length} />
+      <Header
+        noInCart={selectedProducts.length}
+        handleOpenCart={handleOpenCart}
+      />
       <div className="mx-[16px] md:mx-[64px] bg-white flex justify-between mt-4 md:mt-32 py-4 items-center px-[16px] md:px-[32px] rounded-lg">
         <h2 className="text-[18px] md:text-[32px] font-semibold text-gray-700">
           Spark Weekly Deals
@@ -218,7 +399,7 @@ const DealsPage = () => {
           onClose={handleCancel}
           key="bottom"
           className="rounded-t-xl"
-          height="95%"
+          height="90%"
           open={openCheckOut}
           title={
             <div className="text-[24px]">
@@ -227,164 +408,8 @@ const DealsPage = () => {
             </div>
           }
         >
-          {modalView === "cart" && (
-            <div>
-              <div className="pb-4 border-b">
-                {selectedProducts.map((product, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center mt-3 bg-gray-100 rounded-lg px-4 py-2"
-                  >
-                    <div className="w-full">
-                      <div className="w-full text-[16px] font-medium ">
-                        {product.productName}
-                      </div>
-                      <p className="text-[14px] text-gray-500">
-                        GH₵ {product.currentPrice * product.value}
-                      </p>
-                    </div>
-                    <div className="flex items-center mx-6 justify-evenly">
-                      <FaMinusCircle
-                        size={32}
-                        onClick={() => minusItem(index)}
-                        className="cursor-pointer"
-                      />
-                      <div className="w-full place-content-center">
-                        <input
-                          type="number"
-                          value={product.value}
-                          onChange={(e) => handleChange(e, index)}
-                          placeholder="0"
-                          className="bg-gray-100 w-full text-center rounded-md focus:outline-none focus:shadow-outline-blue placeholder-black text-[18px]"
-                        />
-                        {/* {product.measurement} */}
-                      </div>
-                      <FaPlusCircle
-                        size={32}
-                        onClick={() => addItem(index)}
-                        className="cursor-pointer"
-                      />
-                    </div>
-                    <p
-                      className="cursor-pointer text-red-900 hover:text-red-500 text-[12px]"
-                      onClick={() => {
-                        handleRemoveProduct(product.id);
-                      }}
-                    >
-                      remove
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div
-                className="cursor-pointer text-green mt-2 w-full text-center"
-                onClick={handleOk}
-              >
-                Add More Items
-              </div>
-              <div
-                className="text-[16px] w-full text-center cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] text-whitepx-8 py-4 rounded-md text-white"
-                onClick={() => {
-                  selectedProducts.length !== 0
-                    ? setModalView("checkOut")
-                    : alert("Please add an item to continue");
-                }}
-              >
-                {" "}
-                Proceed to Checkout
-              </div>
-            </div>
-          )}
-
-          {modalView === "checkOut" && (
-            <div ref={form} className="">
-              {selectedProducts.length > 0 && (
-                <div>
-                  {selectedProducts.map((product, index) => (
-                    <div
-                      key={index}
-                      className="flex text-gray-600 justify-between items-center mb-4 border-b pb-4"
-                    >
-                      <p>{product.productName}</p>
-                      <p>
-                        {product.value} {product.measurement}
-                      </p>
-                      <p>GH₵ {product.currentPrice * product.value}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="font-medium flex justify-between items-center mb-4 border-b pb-4">
-                <p>Total</p>
-
-                <p>GH₵ {totalValue}</p>
-              </div>
-
-              <h2 className="mt-8 font-medium">Please Enter your Details</h2>
-              <div className="mt-4">
-                <div className="mb-1">
-                  <label className="text-gray-500"> Name</label>
-                </div>
-                <Input
-                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-                  placeholder="Please enter your name"
-                  value={userName}
-                  required={true}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div className="mt-4">
-                <div className="mb-1">
-                  <label className="text-gray-500"> Phone Number </label>
-                </div>
-                <Input
-                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-                  placeholder="Please enter your phone number"
-                  value={userPhone}
-                  required={true}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-              <div className="mt-4">
-                <div className="mb-1">
-                  <label className="text-gray-500"> Email Address </label>
-                </div>
-                <Input
-                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-                  placeholder="Please enter your email"
-                  value={userEmail}
-                  required={true}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="mt-4">
-                <div className="mb-1">
-                  <label className="text-gray-500"> House Address </label>
-                </div>
-                <Input
-                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-                  placeholder="Please enter your address"
-                  value={userAddress}
-                  required={true}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
-
-              <div
-                className={`${
-                  isCheckOutValid
-                    ? "bg-green hover:bg-[#0f5c2e] text-white"
-                    : "bg-gray-200 text-gray-500"
-                } text-[16px] w-full text-center cursor-pointer mt-8 capitalize px-8 py-4 rounded-md`}
-                onClick={() => {
-                  isCheckOutValid && handleProcessOrder();
-                }}
-              >
-                {" "}
-                Checkout
-              </div>
-            </div>
-          )}
+          {modalView === "cart" && displayCart()}
+          {modalView === "checkOut" && displayCheckout()}
         </Drawer>
       )}
 
@@ -404,164 +429,8 @@ const DealsPage = () => {
           }
           width={480}
         >
-          {modalView === "cart" && (
-            <div>
-              <div className="mt-4 pb-4 border-b">
-                {selectedProducts.map((product, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center bg-gray-100 rounded-lg mt-2 px-4 py-2"
-                  >
-                    <div className="w-full">
-                      <div className="w-full text-[16px] font-medium ">
-                        {product.productName}
-                      </div>
-                      <p className="text-[14px] text-gray-500">
-                        GH₵ {product.currentPrice * product.value}
-                      </p>
-                    </div>
-                    <div className="flex items-center mx-6 justify-evenly">
-                      <FaMinusCircle
-                        size={32}
-                        onClick={() => minusItem(index)}
-                        className="cursor-pointer"
-                      />
-                      <div className="w-full place-content-center">
-                        <input
-                          type="number"
-                          value={product.value}
-                          onChange={(e) => handleChange(e, index)}
-                          placeholder="0"
-                          className="bg-gray-100 w-full text-center rounded-md focus:outline-none focus:shadow-outline-blue placeholder-black text-[18px]"
-                        />
-                        {/* {product.measurement} */}
-                      </div>
-                      <FaPlusCircle
-                        size={32}
-                        onClick={() => addItem(index)}
-                        className="cursor-pointer"
-                      />
-                    </div>
-                    <p
-                      className="cursor-pointer text-red-900 hover:text-red-500 text-[12px]"
-                      onClick={() => {
-                        handleRemoveProduct(product.id);
-                      }}
-                    >
-                      remove
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div
-                className="cursor-pointer text-green mt-2 w-full text-center"
-                onClick={handleOk}
-              >
-                Add More Items
-              </div>
-              <div
-                className="text-[16px] w-full text-center cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] text-whitepx-8 py-4 rounded-md text-white w-fit"
-                onClick={() => {
-                  selectedProducts.length !== 0
-                    ? setModalView("checkOut")
-                    : alert("Please add an item to continue");
-                }}
-              >
-                {" "}
-                Proceed to Checkout
-              </div>
-            </div>
-          )}
-
-          {modalView === "checkOut" && (
-            <div className="mt-8">
-              {selectedProducts.length > 0 && (
-                <div>
-                  {selectedProducts.map((product, index) => (
-                    <div
-                      key={index}
-                      className="flex text-gray-600 justify-between items-center mb-4 border-b pb-4"
-                    >
-                      <p>{product.productName}</p>
-                      <p>
-                        {product.value} {product.measurement}
-                      </p>
-                      <p>GH₵ {product.currentPrice * product.value}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="font-medium flex justify-between items-center mb-4 border-b pb-4">
-                <p>Total</p>
-
-                <p>GH₵ {totalValue}</p>
-              </div>
-
-              <h2 className="mt-8 font-medium">Please Enter your Details</h2>
-              <div className="mt-4">
-                <div className="mb-1">
-                  <label className="text-gray-500"> Name</label>
-                </div>
-                <Input
-                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-                  placeholder="Please enter your name"
-                  value={userName}
-                  required={true}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div className="mt-4">
-                <div className="mb-1">
-                  <label className="text-gray-500"> Phone Number </label>
-                </div>
-                <Input
-                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-                  placeholder="Please enter your phone number"
-                  value={userPhone}
-                  required={true}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-              <div className="mt-4">
-                <div className="mb-1">
-                  <label className="text-gray-500"> Email Address </label>
-                </div>
-                <Input
-                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-                  placeholder="Please enter your email"
-                  value={userEmail}
-                  required={true}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="mt-4">
-                <div className="mb-1">
-                  <label className="text-gray-500"> House Address </label>
-                </div>
-                <Input
-                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-                  placeholder="Please enter your address"
-                  value={userAddress}
-                  required={true}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
-
-              <div
-                className={`${
-                  isCheckOutValid
-                    ? "bg-green hover:bg-[#0f5c2e] text-white"
-                    : "bg-gray-200 text-gray-500"
-                } text-[16px] w-full text-center cursor-pointer mt-8 capitalize px-8 py-4 rounded-md`}
-                onClick={() => {
-                  isCheckOutValid && handleProcessOrder();
-                }}
-              >
-                {" "}
-                Checkout
-              </div>
-            </div>
-          )}
+          {modalView === "cart" && displayCart()}
+          {modalView === "checkOut" && displayCheckout()}
         </Modal>
       )}
     </div>
