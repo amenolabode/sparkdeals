@@ -9,13 +9,6 @@ import { v4 } from "uuid";
 import { Modal, Drawer } from "antd";
 import { FaEllipsisV } from "react-icons/fa";
 
-const initialState = {
-  productName: "",
-  oldPrice: "",
-  currentPrice: 0,
-  availableQTY: 0,
-  measurement: "",
-};
 const AdminPage = () => {
   const [productName, setProductName] = useState("");
   const [oldPrice, setOldPrice] = useState(0);
@@ -25,9 +18,10 @@ const AdminPage = () => {
   const [image, setImage] = useState(null);
   const [newDeal, setNewdeal] = useState(false);
   const [allDocs, setAllDocs] = useState([]);
-  const [imageURL, setImageURL] = useState("");
+  const [orderDocs, setOrderDocs] = useState([]);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [useDrawer, setUseDrawer] = useState(false);
+  const [activePage, setActivePage] = useState("deals");
 
   const handleOk = () => {
     setNewdeal(false);
@@ -36,6 +30,19 @@ const AdminPage = () => {
   const handleCancel = () => {
     setNewdeal(false);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const ordersRef = collection(db, "orders");
+      const querySnapshot = await getDocs(ordersRef);
+      const documents = [];
+      querySnapshot.forEach((doc) => {
+        documents.push({ id: doc.id, ...doc.data() });
+      });
+      setOrderDocs(documents);
+    };
+    fetchData();
+  }, [newDeal, productName]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,7 +104,6 @@ const AdminPage = () => {
       .catch((error) => {
         // console.error("Error handling file:", error);
       });
-
     setNewdeal(false);
   };
 
@@ -134,106 +140,224 @@ const AdminPage = () => {
         <h2 className="text-[24px] font-medium">Admin Page</h2>
         <div
           className="text-[16px] w-content text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
-          onClick={() => setNewdeal(!newDeal)
-          }
+          onClick={() => setNewdeal(!newDeal)}
         >
           {" "}
           Add new Deal
         </div>
       </div>
-
-      <div className={`${useDrawer && "hidden"} px-[16px] md:px-[64px] mt-4`}>
-        <table className="w-full text-base font-normal text-left text-white table-auto">
-          <thead className="bg-black ">
-            <tr>
-              <th
-                scope="col"
-                className="px-2 py-4 pl-4 font-normal rounded-l-md"
-              >
-                Product Name
-              </th>
-
-              <th scope="col" className="py-4 font-normal ">
-                Old Price
-              </th>
-              <th scope="col" className="py-4 font-normal ">
-                Current Price
-              </th>
-              <th scope="col" className="px-4 py-4 font-normal text-center">
-                Qty Available
-              </th>
-              <th scope="col" className="px-2 py-4 font-normal text-center">
-                Measurement
-              </th>
-
-              <th
-                scope="col"
-                className="px-2 py-4 font-normal rounded-r-md"
-              ></th>
-            </tr>
-          </thead>
-
-          {/* //TABLE ROWS */}
-          <tbody>
-            {allDocs.map((product) => (
-              <tr
-                className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50"
-                key={product.id}
-              >
-                <td onClick={() => {}} className="py-6 pl-4 text-gray-700">
-                  {product.productName}
-                </td>
-                <td onClick={() => {}} className="py-4 text-gray-700">
-                  {product.oldPrice}
-                </td>
-                <td onClick={() => {}} className="py-6 pl-4 text-gray-700">
-                  {product.currentPrice}
-                </td>
-                <td onClick={() => {}} className="text-center text-gray-700">
-                  {product.availableQTY}
-                </td>
-                <td
-                  onClick={() => {}}
-                  className="px-4 py-4 text-center text-gray-700"
-                >
-                  {product.measurement}
-                </td>
-                <td
-                  onClick={() => {}}
-                  className="px-4 py-4 text-center text-gray-700"
-                >
-                  <FaEllipsisV />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="flex px-[16px] md:mx-[64px] mt-4 md:mt-8 w-full">
+        {" "}
+        <div
+          className={`cursor-pointer ${
+            activePage === "deals" && "bg-green text-white rounded-md"
+          } px-8 py-2 text-gray-600`}
+          onClick={() => setActivePage("deals")}
+        >
+          Deals
+        </div>
+        <div
+          className={`cursor-pointer ${
+            activePage === "orders" && "bg-green text-white rounded-md"
+          } px-8 py-2 text-gray-600`}
+          onClick={() => setActivePage("orders")}
+        >
+          Orders
+        </div>
       </div>
 
-      <div className={`${!useDrawer && "hidden"}`}>
-        {allDocs.map((product) => (
+      {activePage === "deals" && (
+        <>
           <div
-            // key={index}
-            className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-2"
+            className={`${useDrawer && "hidden"} px-[16px] md:px-[64px] mt-4`}
           >
-            <div className="w-full">
-              <div className="w-full text-[16px] font-medium mb-1">
-                {product.productName}
-              </div>
+            <table className="w-full text-base font-normal text-left text-white table-auto">
+              <thead className="bg-black ">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-2 py-4 pl-4 font-normal rounded-l-md"
+                  >
+                    Product Name
+                  </th>
 
-              <div className="flex items-center">
-                <p className="text-[14px] text-gray-500">
-                  GH₵ {product.currentPrice}
-                </p>
-                <div className="mx-2 rounded-[12px] h-1 w-1 bg-gray-300"></div>
-                <p className="text-[14px] text-gray-500">
-                  {product.availableQTY} {product.measurement} Available
-                </p>
-              </div>
-            </div>
+                  <th scope="col" className="py-4 font-normal ">
+                    Old Price
+                  </th>
+                  <th scope="col" className="py-4 font-normal ">
+                    Current Price
+                  </th>
+                  <th scope="col" className="px-4 py-4 font-normal text-center">
+                    Qty Available
+                  </th>
+                  <th scope="col" className="px-2 py-4 font-normal text-center">
+                    Measurement
+                  </th>
+
+                  <th
+                    scope="col"
+                    className="px-2 py-4 font-normal rounded-r-md"
+                  ></th>
+                </tr>
+              </thead>
+
+              {/* //TABLE ROWS */}
+              <tbody>
+                {allDocs.map((product) => (
+                  <tr
+                    className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50"
+                    key={product.id}
+                  >
+                    <td onClick={() => {}} className="py-6 pl-4 text-gray-700">
+                      {product.productName}
+                    </td>
+                    <td onClick={() => {}} className="py-4 text-gray-700">
+                      {product.oldPrice}
+                    </td>
+                    <td onClick={() => {}} className="py-6 pl-4 text-gray-700">
+                      {product.currentPrice}
+                    </td>
+                    <td
+                      onClick={() => {}}
+                      className="text-center text-gray-700"
+                    >
+                      {product.availableQTY}
+                    </td>
+                    <td
+                      onClick={() => {}}
+                      className="px-4 py-4 text-center text-gray-700"
+                    >
+                      {product.measurement}
+                    </td>
+                    <td
+                      onClick={() => {}}
+                      className="px-4 py-4 text-center text-gray-700"
+                    >
+                      <FaEllipsisV />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div>
+
+          <div className={`${!useDrawer && "hidden"}`}>
+            {allDocs.map((product) => (
+              <div
+                // key={index}
+                className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-2"
+              >
+                <div className="w-full">
+                  <div className="w-full text-[16px] font-medium mb-1">
+                    {product.productName}
+                  </div>
+
+                  <div className="flex items-center">
+                    <p className="text-[14px] text-gray-500">
+                      GH₵ {product.currentPrice}
+                    </p>
+                    <div className="mx-2 rounded-[12px] h-1 w-1 bg-gray-300"></div>
+                    <p className="text-[14px] text-gray-500">
+                      {product.availableQTY} {product.measurement} Available
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {activePage === "orders" && (
+        <>
+          {/* orderDocs */}
+          <div
+            className={`${useDrawer && "hidden"} px-[16px] md:px-[64px] mt-4`}
+          >
+            <table className="w-full text-base font-normal text-left text-white table-auto">
+              <thead className="bg-black ">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-2 py-4 pl-4 font-normal rounded-l-md"
+                  >
+                    Product Name
+                  </th>
+
+                  <th scope="col" className="py-4 font-normal ">
+                    Quantity
+                  </th>
+                  <th scope="col" className="px-4 py-4 font-normal text-center">
+                    User
+                  </th>
+                  <th scope="col" className="px-2 py-4 font-normal text-center">
+                    Phone
+                  </th>
+
+                  <th
+                    scope="col"
+                    className="px-2 py-4 font-normal rounded-r-md"
+                  ></th>
+                </tr>
+              </thead>
+
+              {/* //TABLE ROWS */}
+              <tbody>
+                {orderDocs.map((order) => (
+                  <tr className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50">
+                    <td className="py-6 pl-4 text-gray-700">
+                      {order.selectedProducts.map((product) => (
+                        <div>{product.productName}</div>
+                      ))}
+                    </td>
+                    <td className="py-4 text-gray-700">
+                      {order.selectedProducts.map((product) => (
+                        <div>{product.value}</div>
+                      ))}
+                    </td>
+                    <td className="text-center text-gray-700">
+                      {order.userName}
+                    </td>
+                    <td className="px-4 py-4 text-center text-gray-700">
+                      {order.userPhone}
+                    </td>
+                    <td className="px-4 py-4 text-center text-gray-700">
+                      <FaEllipsisV />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${!useDrawer && "hidden"}`}>
+            {orderDocs.map((order) => (
+              <div className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-2">
+                <div className="w-full">
+                  <div className="w-full text-[16px] font-medium mb-1">
+                    {order.selectedProducts.map((product) => (
+                      <div className="flex items-center">
+                        <div className="mr-4">{product.productName}</div>
+                        <div className="text-[12px] text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-[1px] rounded-md">{product.value} {product.measurement}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center">
+                    <p className="text-[14px] text-gray-500">
+                      {order.userName}
+                    </p>
+                    <div className="mx-2 rounded-[12px] h-1 w-1 bg-gray-300"></div>
+                    <p className="text-[14px] text-gray-500">
+                    {order.userPhone}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {!useDrawer && newDeal && (
         <Modal
