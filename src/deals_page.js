@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/product_display";
 import { Modal, Input, Drawer } from "antd";
 import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from "./utils/init_firebase";
+import emailjs from "@emailjs/browser";
 
 const DealsPage = () => {
   const [openCheckOut, setOpenCheckOut] = useState(false);
@@ -36,6 +37,26 @@ const DealsPage = () => {
     }
 
     setOpenCheckOut(true);
+  };
+
+  const form = useRef()
+  const submitEmailHandler = () => {
+    emailjs
+      .sendForm(
+        "service_vtcz456",
+        "template_zco880e",
+        form.current,
+        "tmnsvtTFyEkOyaF5Q"
+        // "CwUBNcETMg_xbgeS7Nad4"
+      )
+      .then(
+        (result) => {
+          console.log(result.text);
+        },
+        (error) => {
+          console.log(error.text);
+        }
+      );
   };
 
   const handleRemoveProduct = (productId) => {
@@ -78,8 +99,6 @@ const DealsPage = () => {
     0
   );
 
-
-
   const handleProcessOrder = (event) => {
     const collectionRef = collection(db, "orders");
     addDoc(collectionRef, {
@@ -90,7 +109,7 @@ const DealsPage = () => {
       userPhone,
       userAddress,
     }).then(() => {
-      // submitEmailHandler();
+      submitEmailHandler();
       setSelectedProducts([]);
       setAddress("");
       setEmail("");
@@ -147,7 +166,9 @@ const DealsPage = () => {
     <div className="pb-24 md:pb-8">
       <Header noInCart={selectedProducts.length} />
       <div className="mx-[16px] md:mx-[64px] bg-white flex justify-between mt-4 md:mt-32 py-4 items-center px-[16px] md:px-[32px] rounded-lg">
-        <h2 className="text-[18px] md:text-[32px] font-semibold text-gray-700">Spark Weekly Deals</h2>
+        <h2 className="text-[18px] md:text-[32px] font-semibold text-gray-700">
+          Spark Weekly Deals
+        </h2>
       </div>
       {allDocs.length === 0 && (
         <div className="flex px-6 py-2 mb-8 space-x-4 animate-pulse mt-24">
@@ -275,7 +296,7 @@ const DealsPage = () => {
           )}
 
           {modalView === "checkOut" && (
-            <div className="">
+            <div ref={form} className="">
               {selectedProducts.length > 0 && (
                 <div>
                   {selectedProducts.map((product, index) => (
