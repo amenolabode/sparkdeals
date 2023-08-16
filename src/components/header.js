@@ -44,7 +44,8 @@ export const Header = ({ noInCart }) => {
         />
         <Drawer
           open={openNavBar}
-          anchor={"left"}
+          // anchor={"left"}
+          key="right"
           onClose={() => setOpenNavBar(false)}
         >
           {MobileSideNavItems()}

@@ -6,7 +6,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db, storage } from "./utils/init_firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
-import { Modal } from "antd";
+import { Modal, Drawer } from "antd";
 import { FaEllipsisV } from "react-icons/fa";
 
 const initialState = {
@@ -26,6 +26,8 @@ const AdminPage = () => {
   const [newDeal, setNewdeal] = useState(false);
   const [allDocs, setAllDocs] = useState([]);
   const [imageURL, setImageURL] = useState("");
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [useDrawer, setUseDrawer] = useState(false);
 
   const handleOk = () => {
     setNewdeal(false);
@@ -46,7 +48,7 @@ const AdminPage = () => {
       setAllDocs(documents);
     };
     fetchData();
-  }, [newDeal]);
+  }, [newDeal, productName]);
 
   const handleFile = () => {
     return new Promise((resolve, reject) => {
@@ -99,6 +101,23 @@ const AdminPage = () => {
     setNewdeal(false);
   };
 
+  useEffect(() => {
+    function handleResize() {
+      setScreenWidth(window.innerWidth);
+    }
+
+    if (screenWidth < 640) {
+      setUseDrawer(true);
+    } else {
+      setUseDrawer(false);
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [screenWidth]);
+
   const isAdditionValid =
     productName !== "" &&
     oldPrice !== 0 &&
@@ -111,20 +130,19 @@ const AdminPage = () => {
     <div>
       <Header />
 
-      <div className="flex justify-between mt-24 pb-4 items-center px-[64px]">
+      <div className="mx-[16px] md:mx-[64px] bg-white flex justify-between mt-4 md:mt-32 py-4 items-center px-[16px] md:px-[32px] rounded-lg">
         <h2 className="text-[24px] font-medium">Admin Page</h2>
         <div
           className="text-[16px] w-content text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
-          onClick={() => {
-            setNewdeal(!newDeal);
-          }}
+          onClick={() => setNewdeal(!newDeal)
+          }
         >
           {" "}
           Add new Deal
         </div>
       </div>
 
-      <div className="px-[64px]">
+      <div className={`${useDrawer && "hidden"} px-[16px] md:px-[64px] mt-4`}>
         <table className="w-full text-base font-normal text-left text-white table-auto">
           <thead className="bg-black ">
             <tr>
@@ -192,7 +210,32 @@ const AdminPage = () => {
         </table>
       </div>
 
-      {newDeal && (
+      <div className={`${!useDrawer && "hidden"}`}>
+        {allDocs.map((product) => (
+          <div
+            // key={index}
+            className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-2"
+          >
+            <div className="w-full">
+              <div className="w-full text-[16px] font-medium mb-1">
+                {product.productName}
+              </div>
+
+              <div className="flex items-center">
+                <p className="text-[14px] text-gray-500">
+                  GH₵ {product.currentPrice}
+                </p>
+                <div className="mx-2 rounded-[12px] h-1 w-1 bg-gray-300"></div>
+                <p className="text-[14px] text-gray-500">
+                  {product.availableQTY} {product.measurement} Available
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {!useDrawer && newDeal && (
         <Modal
           open={newDeal}
           onOk={handleOk}
@@ -288,7 +331,7 @@ const AdminPage = () => {
                     ? "bg-green hover:bg-[#0f5c2e] text-white"
                     : "bg-gray-200 text-gray-500"
                 } text-[16px] w-full mt-8 text-center cursor-pointer capitalize  px-8 py-4 rounded-md w-fit`}
-                onClick={isAdditionValid && handleSubmit}
+                onClick={isAdditionValid ? handleSubmit : undefined}
               >
                 {" "}
                 Add Deal
@@ -296,6 +339,111 @@ const AdminPage = () => {
             </div>
           }
         </Modal>
+      )}
+      {useDrawer && newDeal && (
+        <Drawer
+          placement="bottom"
+          closable={false}
+          onClose={handleCancel}
+          key="bottom"
+          className="rounded-t-xl"
+          height="95%"
+          open={newDeal}
+          title={<div className="text-[24px]">Add New Deal</div>}
+        >
+          {
+            <div className="mx-auto">
+              <div className="mt-4">
+                <div className="mb-1">
+                  <label className="text-gray-500">Product Image</label>
+                </div>
+                <Input
+                  type="file"
+                  name="image"
+                  onChange={(e) => {
+                    setImage(e.target.files[0]);
+                  }}
+                ></Input>
+              </div>
+
+              <div className="mt-4">
+                <div className="mb-1">
+                  <label className="text-gray-500"> Product Name</label>
+                </div>
+                <Input
+                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+                  placeholder="Please enter Product Name"
+                  value={productName}
+                  required={true}
+                  onChange={(e) => setProductName(e.target.value)}
+                />
+              </div>
+              <div className="mt-4">
+                <div className="mb-1">
+                  <label className="text-gray-500"> Old (Market) Price </label>
+                </div>
+                <Input
+                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+                  placeholder="Old Price"
+                  value={oldPrice}
+                  required={true}
+                  onChange={(e) => setOldPrice(e.target.value)}
+                />
+              </div>
+              <div className="mt-4">
+                <div className="mb-1">
+                  <label className="text-gray-500"> New (Spark) Price </label>
+                </div>
+                <Input
+                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+                  placeholder="New Price"
+                  value={newPrice}
+                  required={true}
+                  onChange={(e) => setNewPrice(e.target.value)}
+                />
+              </div>
+              <div className="mt-4">
+                <div className="mb-1">
+                  <label className="text-gray-500"> Available Quantity </label>
+                </div>
+                <Input
+                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+                  placeholder="Available Quantity"
+                  value={quantity}
+                  required={true}
+                  onChange={(e) => setQuantity(e.target.value)}
+                />
+              </div>
+              <div className="mt-4">
+                <div className="mb-1">
+                  <label className="text-gray-500">
+                    {" "}
+                    Unit (Kg, Pieces, Packs){" "}
+                  </label>
+                </div>
+                <Input
+                  className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+                  placeholder="Kg, Pieces, Packs"
+                  value={unit}
+                  required={true}
+                  onChange={(e) => setUnit(e.target.value)}
+                />
+              </div>
+
+              <div
+                className={`${
+                  isAdditionValid
+                    ? "bg-green hover:bg-[#0f5c2e] text-white"
+                    : "bg-gray-200 text-gray-500"
+                } text-[16px] w-full mt-8 text-center cursor-pointer capitalize  px-8 py-4 rounded-md w-fit`}
+                onClick={isAdditionValid ? handleSubmit : undefined}
+              >
+                {" "}
+                Add Deal
+              </div>
+            </div>
+          }
+        </Drawer>
       )}
     </div>
   );
