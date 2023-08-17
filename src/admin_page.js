@@ -172,6 +172,22 @@ const AdminPage = () => {
     }
   };
 
+  const setLocalState = (page) => {
+    localStorage.setItem("page", JSON.stringify(page));
+  };
+
+  const handlePageChange = (page) => {
+    setActivePage(page);
+    setLocalState(page);
+  };
+
+  useEffect(() => {
+    const savedPage = localStorage.getItem("page");
+    if (savedPage) {
+      setActivePage(JSON.parse(savedPage));
+    }
+  }, []);
+
   const handleSubmit = () => {
     handleFile()
       .then((imageURL) => {
@@ -396,7 +412,9 @@ const AdminPage = () => {
             className={`cursor-pointer ${
               activePage === "deals" && "bg-green text-white rounded-md"
             } px-4 md:px-8 py-2 text-gray-600`}
-            onClick={() => setActivePage("deals")}
+            onClick={() => {
+              handlePageChange("deals");
+            }}
           >
             Deals
           </div>
@@ -404,7 +422,9 @@ const AdminPage = () => {
             className={`cursor-pointer ${
               activePage === "orders" && "bg-green text-white rounded-md"
             } px-4 md:px-8 py-2 text-gray-600`}
-            onClick={() => setActivePage("orders")}
+            onClick={() => {
+              handlePageChange("orders");
+            }}
           >
             Orders
           </div>

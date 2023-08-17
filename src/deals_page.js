@@ -49,6 +49,14 @@ const DealsPage = () => {
       ]);
     }
 
+    const updatedCart = [
+      ...selectedProducts,
+      { ...product, value: product.value || 1 },
+    ];
+
+    // Save cart data to localStorage
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+
     setOpenCheckOut(true);
   };
 
@@ -172,6 +180,7 @@ const DealsPage = () => {
       setModalView("cart");
 
       submitEmailHandler(newOrder);
+      clearCart();
     } catch (error) {
       console.error("Error placing order:", error);
       setLoading(false);
@@ -202,6 +211,18 @@ const DealsPage = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
+    if (savedCart) {
+      setSelectedProducts(JSON.parse(savedCart));
+    }
+  }, []);
+
+  const clearCart = () => {
+    setSelectedProducts([]);
+    localStorage.removeItem("cart");
+  };
 
   useEffect(() => {
     function handleResize() {
