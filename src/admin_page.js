@@ -2,13 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import Input from "antd/es/input/Input";
 import { addDoc } from "firebase/firestore";
-import { collection, doc, deleteDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  deleteDoc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { db, storage } from "./utils/init_firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { Modal, Drawer, DatePicker } from "antd";
 import {
-  FaChevronCircleDown,
   FaChevronCircleUp,
   FaEllipsisV,
   FaExclamationCircle,
@@ -35,6 +40,7 @@ const AdminPage = () => {
   const [modalVisible, setModalVisible] = useState("");
   const [modalData, setModalData] = useState("");
   const [showDetails, setShowDetails] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSetMenuToggle = (value) => {
     if (menuToggle === value) {
@@ -47,6 +53,12 @@ const AdminPage = () => {
     setOpenModal("delete");
     setModalVisible(true);
     setModalData(data);
+  };
+
+  const handleOpenHistory = () => {
+    setOpenModal("history");
+    setModalVisible(true);
+    // setModalData(data);
   };
 
   const handleStartDateChange = (dateString) => {
@@ -89,7 +101,7 @@ const AdminPage = () => {
       setOrderDocs(documents);
     };
     fetchData();
-  }, [openModal, productName]);
+  }, [openModal, productName, loading]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,7 +114,7 @@ const AdminPage = () => {
       setAllDocs(documents);
     };
     fetchData();
-  }, [openModal, productName]);
+  }, [openModal, productName, loading]);
 
   const handleFile = () => {
     return new Promise((resolve, reject) => {
@@ -128,6 +140,36 @@ const AdminPage = () => {
   };
 
   const discount = Math.floor(100 - (newPrice / oldPrice) * 100);
+
+  const handlePaymentUpdate = async (orderId) => {
+    try {
+      setLoading(true);
+      const orderRef = doc(db, "orders", orderId);
+      await updateDoc(orderRef, {
+        paid: true,
+      });
+
+      setLoading(false);
+      setMenuToggle("");
+      setMenuVisible(false);
+    } catch (error) {
+      console.error("Error updating payment:", error);
+    }
+  };
+  const handleDeliveryUpdate = async (orderId) => {
+    try {
+      setLoading(true);
+      const orderRef = doc(db, "orders", orderId);
+      await updateDoc(orderRef, {
+        delivered: true,
+      });
+      setLoading(false);
+      setMenuToggle("");
+      setMenuVisible(false);
+    } catch (error) {
+      console.error("Error updating payment:", error);
+    }
+  };
 
   const handleSubmit = () => {
     handleFile()
@@ -316,6 +358,8 @@ const AdminPage = () => {
   return (
     <div>
       <Header />
+      {/* Page */}
+      {/* top */}
       <div className="mx-[16px] md:mx-[64px] bg-white flex justify-between mt-4 md:mt-32 py-4 items-center px-[16px] md:px-[32px] rounded-lg">
         <h2 className="text-[24px] font-medium">Admin Page</h2>
         <div
@@ -331,6 +375,7 @@ const AdminPage = () => {
           Add new Deal
         </div>
       </div>
+      {/* Mobile Add Deal Button */}
       <div
         className={`${
           !useDrawer && "hidden"
@@ -342,27 +387,37 @@ const AdminPage = () => {
       >
         <FaPlus size={18} />
       </div>
-      <div className="flex px-[16px] md:mx-[64px] mt-4 md:mt-8 w-full">
+      {/* Deals and Orders Tab Group */}
+      <div className="flex justify-between items-center px-[16px] md:mx-[64px] mt-4 md:mt-8 w-full">
         {" "}
-        <div
-          className={`cursor-pointer ${
-            activePage === "deals" && "bg-green text-white rounded-md"
-          } px-8 py-2 text-gray-600`}
-          onClick={() => setActivePage("deals")}
-        >
-          Deals
+        <div className="flex">
+          <div
+            className={`cursor-pointer ${
+              activePage === "deals" && "bg-green text-white rounded-md"
+            } px-4 md:px-8 py-2 text-gray-600`}
+            onClick={() => setActivePage("deals")}
+          >
+            Deals
+          </div>
+          <div
+            className={`cursor-pointer ${
+              activePage === "orders" && "bg-green text-white rounded-md"
+            } px-4 md:px-8 py-2 text-gray-600`}
+            onClick={() => setActivePage("orders")}
+          >
+            Orders
+          </div>
         </div>
-        <div
-          className={`cursor-pointer ${
-            activePage === "orders" && "bg-green text-white rounded-md"
-          } px-8 py-2 text-gray-600`}
-          onClick={() => setActivePage("orders")}
-        >
-          Orders
+        <div onClick={() => handleOpenHistory()} className="cursor-pointer text-green">
+          view history
         </div>
       </div>
+      {/* Active Page Display */}
+      {/*  */}
+      {/* Deals Display */}
       {activePage === "deals" && (
         <>
+          {/* Desktop Deals View Table */}
           <div
             className={`${useDrawer && "hidden"} px-[16px] md:px-[64px] mt-4`}
           >
@@ -430,28 +485,11 @@ const AdminPage = () => {
                         handleSetMenuToggle(product.id);
                       }}
                     >
-                      <div>
-                        <FaEllipsisV />
-                      </div>
+                      <FaEllipsisV />
+
                       {menuToggle === product.id
                         ? menuVisible && (
                             <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
-                              <li
-                                onClick={() => {
-                                  // handleOpenModal(trip, "info");
-                                }}
-                                className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
-                              >
-                                View
-                              </li>
-                              <li
-                                onClick={() => {
-                                  // handleOpenModal(trip, "edit");
-                                }}
-                                className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
-                              >
-                                Edit
-                              </li>
                               <li
                                 onClick={() => {
                                   handleOpenDeleteModal(product);
@@ -470,19 +508,17 @@ const AdminPage = () => {
             </table>
           </div>
 
+          {/* Mobile Responsive Deals List */}
           <div className={`${!useDrawer && "hidden"} mt-4`}>
             {allDocs.map((product) => (
-              <div
-                // key={index}
-                className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-4"
-              >
+              <div className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-4">
                 <div className="w-full">
                   <div className="flex items-center text-gray-700">
                     <div className="w-full truncate text-[20px] font-medium mb-1">
                       {product.productName}
                     </div>
                     <div
-                      className=" flex place-content-end"
+                      className="flex place-content-end"
                       onClick={() => {
                         handleSetMenuToggle(product.id);
                       }}
@@ -492,22 +528,6 @@ const AdminPage = () => {
                     {menuToggle === product.id
                       ? menuVisible && (
                           <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
-                            {/* <li
-                              onClick={() => {
-                                // handleOpenModal(trip, "info");
-                              }}
-                              className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
-                            >
-                              View
-                            </li>
-                            <li
-                              onClick={() => {
-                                // handleOpenModal(trip, "edit");
-                              }}
-                              className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
-                            >
-                              Edit
-                            </li> */}
                             <li
                               onClick={() => {
                                 handleOpenDeleteModal(product);
@@ -552,6 +572,10 @@ const AdminPage = () => {
           </div>
         </>
       )}
+
+      {/* Orders Display */}
+      {/* Orders Display */}
+      {/* Desktop Orders Display  Table View*/}
       {activePage === "orders" && (
         <>
           <div
@@ -576,6 +600,9 @@ const AdminPage = () => {
                   <th scope="col" className="px-2 py-4 font-normal text-center">
                     Phone
                   </th>
+                  <th scope="col" className="px-2 py-4 font-normal text-center">
+                    Details
+                  </th>
 
                   <th
                     scope="col"
@@ -585,98 +612,221 @@ const AdminPage = () => {
               </thead>
 
               {/* //TABLE ROWS */}
+              {/* .filter((order) => order.paid === false && order.delivered === true) */}
               <tbody>
-                {orderDocs.map((order) => (
-                  <tr className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50">
-                    <td className="py-6 pl-4 text-gray-700">
-                      {order.selectedProducts.map((product) => (
-                        <div>{product.productName}</div>
-                      ))}
-                    </td>
-                    <td className="py-4 text-gray-700">
-                      {order.selectedProducts.map((product) => (
-                        <div>{product.value}</div>
-                      ))}
-                    </td>
-                    <td className="text-center text-gray-700">
-                      {order.userName}
-                    </td>
-                    <td className="px-4 py-4 text-center text-gray-700">
-                      {order.userPhone}
-                    </td>
-                    <td className="px-4 py-4 text-center text-gray-700">
-                      <FaEllipsisV />
-                    </td>
-                  </tr>
-                ))}
+                {orderDocs
+                  .filter(
+                    (order) => order.paid === false || order.delivered === false
+                  )
+                  .map((order) => (
+                    <tr className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50">
+                      <td className="py-6 pl-4 text-gray-700">
+                        {order.selectedProducts.map((product) => (
+                          <div>{product.productName}</div>
+                        ))}
+                      </td>
+                      <td className="py-4 text-gray-700">
+                        {order.selectedProducts.map((product) => (
+                          <div>{product.value}</div>
+                        ))}
+                      </td>
+                      <td className="text-center text-gray-700">
+                        {order.userName}
+                      </td>
+                      <td className="px-4 py-4 text-center text-gray-700">
+                        {order.userPhone}
+                      </td>
+                      <td className="px-4 py-4 text-center text-gray-700">
+                        <div className="flex text-[12px] gap-1 mt-3 justify-center">
+                          <div
+                            className={`items-center ${
+                              order.paid === false
+                                ? "bg-[#ffc1c1] border border-[#ff8181] text-[#571111] py-1 px-2 rounded-md"
+                                : "bg-[#ccffc1] border border-[#adffab] text-[#115720] py-1 px-2 rounded-md"
+                            }`}
+                          >
+                            {order.paid === false ? "Unpaid" : "Paid"}
+                          </div>
+                          <div
+                            className={`items-center ${
+                              order.delivered === false
+                                ? "bg-[#d6edff] border border-[#6ea5e4] text-[#112657] py-1 px-2 rounded-md"
+                                : "bg-[#f3dcff] border border-[#d2abff] text-[#341157] py-1 px-2 rounded-md"
+                            }`}
+                          >
+                            {order.delivered === false
+                              ? "Undelivered"
+                              : "Delivered"}
+                          </div>
+                        </div>
+                      </td>
+                      <td
+                        onClick={() => {
+                          handleSetMenuToggle(order.id);
+                        }}
+                        className="px-4 py-4 text-center text-gray-700"
+                      >
+                        <FaEllipsisV />
+                      </td>
+                      {menuToggle === order.id
+                        ? menuVisible && (
+                            <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
+                              <li
+                                onClick={() => {
+                                  handlePaymentUpdate(order.id);
+                                }}
+                                className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
+                              >
+                                {loading ? "Updating Payment..." : " Mark Paid"}
+                              </li>
+                              <li
+                                onClick={() => {
+                                  handleDeliveryUpdate(order.id);
+                                }}
+                                className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
+                              >
+                                {loading
+                                  ? "Updating Delivery..."
+                                  : "Mark Delivered"}
+                              </li>
+                            </ul>
+                          )
+                        : ""}
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
 
+          {/* Mobile Responsive Orders List */}
           <div className={`${!useDrawer && "hidden"}`}>
-            {orderDocs.map((order, index) => (
-              <div
-                className="m-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-3"
-                key={order.id}
-              >
-                <div className="w-full">
-                  <div className="items-center ">
-                    <div className="text-[14px] text-green border-b pb-2">
-                      New Order for
-                    </div>
-                    {order.selectedProducts.map((product) => (
-                      <div
-                        className="text-[16px] flex justify-between mt-2"
-                        key={product.id}
-                      >
-                        <p className="mt-1">
-                          {product.value} {product.measurement} of{" "}
-                          {product.productName}
-                        </p>
-                        <p>GH₵ {product.currentPrice * product.value}</p>
-                      </div>
-                    ))}
+            {orderDocs
+              .filter(
+                (order) => order.paid === false || order.delivered === false
+              )
+              .map((order, index) => (
+                <div
+                  className="m-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-3"
+                  key={order.id}
+                >
+                  <div className="w-full">
+                    <div className="items-center ">
+                      <div className="text-[14px] text-gray-500 border-b pb-2 flex items-center w-full justify-between">
+                        <div>New Order for</div>
 
-                    <div
-                      className="mt-4 text-[14px] text-green border-b py-3 flex justify-between items-center"
-                      onClick={() => {
-                        setShowDetails((prevState) => ({
-                          ...prevState,
-                          [index]: !prevState[index],
-                        }));
-                      }}
-                    >
-                      <p>User Details</p>
-                      {showDetails ? (
-                        <FaChevronCircleUp />
-                      ) : (
-                        <FaChevronCircleDown />
+                        <div
+                          className=" place-content-end"
+                          onClick={() => {
+                            handleSetMenuToggle(order.id);
+                          }}
+                        >
+                          <FaEllipsisV className="text-gray-700" />
+                        </div>
+                        {menuToggle === order.id
+                          ? menuVisible && (
+                              <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
+                                <li
+                                  onClick={() => {
+                                    handlePaymentUpdate(order);
+                                  }}
+                                  className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
+                                >
+                                  {loading
+                                    ? "Updating Payment..."
+                                    : " Mark Paid"}
+                                </li>
+                                <li
+                                  onClick={() => {
+                                    handleDeliveryUpdate(order);
+                                  }}
+                                  className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
+                                >
+                                  {loading
+                                    ? "Updating Delivery..."
+                                    : "Mark Delivered"}
+                                </li>
+                              </ul>
+                            )
+                          : ""}
+                      </div>
+
+                      {order.selectedProducts.map((product) => (
+                        <div
+                          className="text-[16px] flex justify-between mt-2"
+                          key={product.id}
+                        >
+                          <p className="mt-1">
+                            {product.value} {product.measurement} of{" "}
+                            {product.productName}
+                          </p>
+                          <p>GH₵ {product.currentPrice * product.value}</p>
+                        </div>
+                      ))}
+                      <div className="flex text-[12px] gap-1 mt-3">
+                        <div
+                          className={`items-center ${
+                            order.paid === false
+                              ? "bg-[#ffc1c1] border border-[#ff8181] text-[#571111] py-1 px-2 rounded-md"
+                              : "bg-[#ccffc1] border border-[#adffab] text-[#115720] py-1 px-2 rounded-md"
+                          }`}
+                        >
+                          {order.paid === false ? "Unpaid" : "Paid"}
+                        </div>
+                        <div
+                          className={`items-center ${
+                            order.delivered === false
+                              ? "bg-[#d6edff] border border-[#6ea5e4] text-[#112657] py-1 px-2 rounded-md"
+                              : "bg-[#f3dcff] border border-[#d2abff] text-[#341157] py-1 px-2 rounded-md"
+                          }`}
+                        >
+                          {order.delivered === false
+                            ? "Undelivered"
+                            : "Delivered"}
+                        </div>
+                      </div>
+
+                      <div
+                        className="mt-4 text-[14px] text-gray-500 border-b py-3 flex justify-between items-center"
+                        onClick={() => {
+                          setShowDetails((prevState) => ({
+                            ...prevState,
+                            [index]: !prevState[index],
+                          }));
+                        }}
+                      >
+                        <p>User Details</p>
+                        {
+                          <FaChevronCircleUp
+                            className={`${showDetails && "-rotate-180"} `}
+                          />
+                        }
+                      </div>
+
+                      {showDetails[index] && (
+                        <div className="mt-2">
+                          <p className="mt-1 text-[14px] text-gray-500">
+                            {order.userName}
+                          </p>
+                          <p className="mt-1 text-[14px] text-gray-500">
+                            {order.userPhone}
+                          </p>
+                          <p className="mt-1 text-[14px] text-gray-500">
+                            {order.userEmail}
+                          </p>
+                          <p className="mt-1 text-[14px] text-gray-500">
+                            {order.userAddress}
+                          </p>
+                        </div>
                       )}
                     </div>
-
-                    {showDetails[index] && (
-                      <div className="mt-2">
-                        <p className="mt-1 text-[14px] text-gray-500">
-                          {order.userName}
-                        </p>
-                        <p className="mt-1 text-[14px] text-gray-500">
-                          {order.userPhone}
-                        </p>
-                        <p className="mt-1 text-[14px] text-gray-500">
-                          {order.userEmail}
-                        </p>
-                        <p className="mt-1 text-[14px] text-gray-500">
-                          {order.userAddress}
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </>
       )}
+
+      {/*Desktop  Add new Deals popup */}
       {modalVisible && openModal === "addDeal" && !useDrawer && (
         <Modal
           open={modalVisible}
@@ -690,7 +840,9 @@ const AdminPage = () => {
         >
           {AddDealForm()}
         </Modal>
-      )}{" "}
+      )}
+
+      {/* Mobile Add new Deals Drawer */}
       {modalVisible && openModal === "addDeal" && useDrawer && (
         <Drawer
           placement="bottom"
@@ -698,13 +850,15 @@ const AdminPage = () => {
           onClose={handleCancel}
           key="bottom"
           className="rounded-t-xl"
-          height="95%"
+          height="90%"
           open={modalVisible}
           title={<div className="text-[24px]">Add New Deal</div>}
         >
           {AddDealForm()}
         </Drawer>
       )}
+
+      {/* Delete Deal popup */}
       {modalVisible && openModal === "delete" && (
         <Modal
           open={modalVisible}
@@ -740,6 +894,8 @@ const AdminPage = () => {
           }
         </Modal>
       )}
+
+      {/* Success popup */}
       {modalVisible && openModal === "success  " && (
         <Modal
           open={modalVisible}
@@ -773,6 +929,28 @@ const AdminPage = () => {
               </div>
             </div>
           }
+        </Modal>
+      )}
+
+      {/*Desktop  View History popup */}
+      {modalVisible && openModal === "history" && !useDrawer && (
+        <Modal
+          open={modalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          centered={true}
+          footer={false}
+          closable={true}
+          title={<div className="text-[24px]">Completed Orders</div>}
+          width={480}
+        >
+          {orderDocs
+            .filter(
+              (order) => order.paid === false || order.delivered === false
+            )
+            .map((order, index) => (
+              <></>
+            ))}
         </Modal>
       )}
     </div>

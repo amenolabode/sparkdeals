@@ -19,18 +19,42 @@ export const Header = ({ noInCart, handleOpenCart }) => {
     setActivePage(path);
   };
 
-  const MobileSideNavItems = () => {
+  const MobileSideNavItems = (handleOpenCart) => {
     return (
-      <div className="flex justify-start text-black  w-full h-full pl-[20px] pr-[100px] py-8">
-        <div className="flex justify-end">
+      <div className=" h-[90%] ">
+        <div className="flex ">
           <AiOutlineClose
             className="text-2xl font-bold text-white"
             onClick={() => setOpenNavBar(false)}
           />
         </div>
-        <div className="flex-col items-center justify-center w-full mt-24 space-y-8 text-black">
-          <h1 className="mb-4 text-[20px] font-semibold ">Home</h1>
+        <div className="flex flex-col text-black  w-full h-full py-8">
+          <div className="flex-col items-center justify-center w-full space-y-8 text-black">
+            <Link to="/" onClick={() => handleLinkClick("/")}>
+              <h2
+                className={`mb-4 text-[20px] font-semibold cursor-pointer hover:text-gray-600 ${
+                  activePage === "/" ? "text-green font-medium" : "text-grey"
+                }`}
+              >
+                Home
+              </h2>
+            </Link>
+            {/* <h1
+              className="mb-4 text-[20px] font-semibold "
+              onClick={handleOpenCart}
+            >
+              Open Cart
+            </h1> */}
+            <h1 className="mb-4 text-[20px] font-semibold">
+              <a href="https://joinspark.app">Spark Website</a>
+            </h1>
+          </div>
         </div>
+        <img
+          className="relative bottom-3 w-[80px] place-content-end justify-end"
+          src="./assets/logo.png"
+          alt=""
+        />
       </div>
     );
   };
@@ -44,11 +68,12 @@ export const Header = ({ noInCart, handleOpenCart }) => {
         />
         <Drawer
           open={openNavBar}
+          placement="left"
           // anchor={"left"}
           key="right"
           onClose={() => setOpenNavBar(false)}
         >
-          {MobileSideNavItems()}
+          {MobileSideNavItems(handleOpenCart)}
         </Drawer>
         <div className="w-full">
           <img
