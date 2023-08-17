@@ -23,8 +23,8 @@ const DealsPage = () => {
   const [useDrawer, setUseDrawer] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [paid, setPaid] = useState(false);
-  const [delivered, setDelivered] = useState(false);
+  const paid = false;
+  const delivered = false;
 
   const isCheckOutValid =
     userAddress !== "" &&
@@ -51,15 +51,19 @@ const DealsPage = () => {
     setOpenCheckOut(true);
   };
 
-  const form = useRef();
   const submitEmailHandler = () => {
+    const emailData = {
+      user_name: userName,
+      user_email: userEmail,
+      message: generateEmailMessage(),
+    };
+
     emailjs
-      .sendForm(
+      .send(
         "service_vtcz456",
         "template_zco880e",
-        form.current,
+        emailData,
         "tmnsvtTFyEkOyaF5Q"
-        // "CwUBNcETMg_xbgeS7Nad4"
       )
       .then(
         (result) => {
@@ -69,6 +73,28 @@ const DealsPage = () => {
           console.log(error.text);
         }
       );
+  };
+
+  const generateEmailMessage = () => {
+    let message = "Order Details:\n";
+    selectedProducts.forEach((product) => {
+      message += `
+          ${product.productName} - ${product.value} ${product.measurement}
+        
+      `;
+    });
+
+    message += `\nTotal: GH₵ ${totalValue}\n
+    
+    `;
+
+    message += `\nBuyer Details\n`;
+    message += `\nName ${userName}\n`;
+    message += `\nEmail: ${userEmail}\n`;
+    message += `\nPhone: ${userPhone}\n`;
+    message += `\nDelivery Address: ${userAddress}\n`;
+
+    return message;
   };
 
   const handleRemoveProduct = (productId) => {
@@ -120,7 +146,8 @@ const DealsPage = () => {
       setLoading(true);
 
       const collectionRef = collection(db, "orders");
-      await addDoc(collectionRef, {
+
+      const newOrder = {
         totalValue,
         selectedProducts,
         userName,
@@ -129,7 +156,9 @@ const DealsPage = () => {
         userAddress,
         paid,
         delivered,
-      });
+      };
+
+      await addDoc(collectionRef, newOrder);
 
       setSelectedProducts([]);
       setAddress("");
@@ -139,6 +168,9 @@ const DealsPage = () => {
       setOpenCheckOut(false);
       setSuccess(true);
       setLoading(false);
+      setModalView("cart");
+
+      submitEmailHandler(newOrder);
     } catch (error) {
       console.error("Error placing order:", error);
       setLoading(false);
@@ -169,6 +201,7 @@ const DealsPage = () => {
 
     fetchData();
   }, []);
+
   useEffect(() => {
     function handleResize() {
       setScreenWidth(window.innerWidth);
@@ -270,7 +303,7 @@ const DealsPage = () => {
 
   const displayCheckout = () => {
     return (
-      <div ref={form} className="">
+      <div classNFme="">
         {selectedProducts.length > 0 && (
           <div>
             {selectedProducts.map((product, index) => (

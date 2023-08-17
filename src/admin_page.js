@@ -388,7 +388,7 @@ const AdminPage = () => {
         <FaPlus size={18} />
       </div>
       {/* Deals and Orders Tab Group */}
-      <div className="flex justify-between items-center px-[16px] md:mx-[64px] mt-4 md:mt-8 w-full">
+      <div className="flex justify-between items-center px-[16px] md:px-[64px] mt-4 md:mt-8 w-full">
         {" "}
         <div className="flex">
           <div
@@ -408,7 +408,10 @@ const AdminPage = () => {
             Orders
           </div>
         </div>
-        <div onClick={() => handleOpenHistory()} className="cursor-pointer text-green">
+        <div
+          onClick={() => handleOpenHistory()}
+          className="cursor-pointer text-green"
+        >
           view history
         </div>
       </div>
@@ -511,7 +514,10 @@ const AdminPage = () => {
           {/* Mobile Responsive Deals List */}
           <div className={`${!useDrawer && "hidden"} mt-4`}>
             {allDocs.map((product) => (
-              <div key={product.id} className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-4">
+              <div
+                key={product.id}
+                className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-4"
+              >
                 <div className="w-full">
                   <div className="flex items-center text-gray-700">
                     <div className="w-full truncate text-[20px] font-medium mb-1">
@@ -619,7 +625,10 @@ const AdminPage = () => {
                     (order) => order.paid === false || order.delivered === false
                   )
                   .map((order, index) => (
-                    <tr key={order[index]} className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50">
+                    <tr
+                      key={order[index]}
+                      className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50"
+                    >
                       <td className="py-6 pl-4 text-gray-700">
                         {order.selectedProducts.map((product) => (
                           <div>{product.productName}</div>
@@ -944,14 +953,62 @@ const AdminPage = () => {
           title={<div className="text-[24px]">Completed Orders</div>}
           width={480}
         >
-          {orderDocs
-            .filter(
-              (order) => order.paid === false || order.delivered === false
-            )
-            .map((order, index) => (
-              <></>
-            ))}
+          <div className="h-[75vh] overflow-y-auto">
+            {orderDocs
+              .filter(
+                (order) => order.paid !== false || order.delivered !== false
+              )
+              .map((order, index) => (
+                <div className="bg-gray-50 px-4 py-2 mb-2 rounded-md">
+                  <div className="justify-between flex">
+                    <p className="text-[16px] font-medium">{order.userName}</p>
+                    <p>GH₵ {order.totalValue}</p>
+                  </div>
+                  {order.selectedProducts.map((product) => (
+                    <p key={product.id} className="mt-1">
+                      {product.value} {product.measurement} of{" "}
+                      {product.productName}
+                    </p>
+                  ))}
+                </div>
+              ))}
+          </div>
         </Modal>
+      )}
+
+      {/*Mobile  View History Drawer */}
+      {modalVisible && openModal === "history" && useDrawer && (
+        <Drawer
+          placement="bottom"
+          closable={false}
+          onClose={handleCancel}
+          key="bottom"
+          className="rounded-t-xl"
+          height="90%"
+          open={modalVisible}
+          title={<div className="text-[24px]">Completed Orders</div>}
+        >
+          <div className="h-[75vh] overflow-y-auto">
+            {orderDocs
+              .filter(
+                (order) => order.paid !== false || order.delivered !== false
+              )
+              .map((order, index) => (
+                <div className="bg-gray-50 px-4 py-2 mb-2 rounded-md">
+                  <div className="justify-between flex">
+                    <p className="text-[16px] font-medium">{order.userName}</p>
+                    <p>GH₵ {order.totalValue}</p>
+                  </div>
+                  {order.selectedProducts.map((product) => (
+                    <p key={product.id} className="mt-1">
+                      {product.value} {product.measurement} of{" "}
+                      {product.productName}
+                    </p>
+                  ))}
+                </div>
+              ))}
+          </div>
+        </Drawer>
       )}
     </div>
   );

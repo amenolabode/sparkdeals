@@ -19,7 +19,7 @@ export const Header = ({ noInCart, handleOpenCart }) => {
     setActivePage(path);
   };
 
-  const MobileSideNavItems = (handleOpenCart) => {
+  const MobileSideNavItems = () => {
     return (
       <div className=" h-[90%] ">
         <div className="flex ">
@@ -39,12 +39,6 @@ export const Header = ({ noInCart, handleOpenCart }) => {
                 Home
               </h2>
             </Link>
-            {/* <h1
-              className="mb-4 text-[20px] font-semibold "
-              onClick={handleOpenCart}
-            >
-              Open Cart
-            </h1> */}
             <h1 className="mb-4 text-[20px] font-semibold">
               <a href="https://joinspark.app">Spark Website</a>
             </h1>
@@ -75,7 +69,7 @@ export const Header = ({ noInCart, handleOpenCart }) => {
         >
           {MobileSideNavItems(handleOpenCart)}
         </Drawer>
-        <div className="w-full">
+        <div className="w-full md:w-fit">
           <img
             src="./assets/logo.png"
             alt=""
@@ -87,19 +81,16 @@ export const Header = ({ noInCart, handleOpenCart }) => {
         </div>
 
         <div className="flex text-black items-center space-x-8 justify-end text-[16px] font-[400]">
-          <Link to="/" onClick={() => handleLinkClick("/")}>
-            <h2
-              className={`hidden md:block cursor-pointer hover:text-gray-600 ${
-                activePage === "/" ? "text-green font-medium" : "text-grey"
-              }`}
-            >
-              Home
-            </h2>
-          </Link>
+          <h2
+            className={`w-fit hidden md:block cursor-pointer hover:text-gray-600 ${"text-green font-medium"}`}
+          >
+            <a href="https://joinspark.app">Spark Website</a>
+          </h2>
+
           <Link to="/" onClick={handleOpenCart}>
             <h2
-              className={`mr-[16px] md:mr-0 cursor-pointer hover:text-gray-600 flex ${
-                activePage === "/" ? "text-green font-medium" : "text-grey"
+              className={`text-green font-medium mr-[16px] md:mr-0 cursor-pointer hover:text-gray-600 flex ${
+                activePage === "/" ? "block" : "hidden"
               }`}
             >
               Cart{" "}
