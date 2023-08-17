@@ -87,10 +87,14 @@ const DealsPage = () => {
     setModalView("cart");
   };
 
-  const addItem = (index) => {
+  const addItem = (index, quantity) => {
     setSelectedProducts((prevProducts) => {
       const updatedProducts = [...prevProducts];
-      updatedProducts[index].value += 1;
+      const product = updatedProducts[index];
+
+      if (product.value < quantity) {
+        product.value += 1;
+      }
 
       return updatedProducts;
     });
@@ -113,7 +117,6 @@ const DealsPage = () => {
 
   const handleProcessOrder = async () => {
     try {
-      
       setLoading(true);
 
       const collectionRef = collection(db, "orders");
@@ -125,7 +128,7 @@ const DealsPage = () => {
         userPhone,
         userAddress,
         paid,
-        delivered
+        delivered,
       });
 
       setSelectedProducts([]);
@@ -225,7 +228,7 @@ const DealsPage = () => {
                 </div>
                 <FaPlusCircle
                   size={32}
-                  onClick={() => addItem(index)}
+                  onClick={() => addItem(index, product.availableQTY)}
                   className="cursor-pointer"
                 />
               </div>
@@ -329,7 +332,7 @@ const DealsPage = () => {
         </div>
         <div className="mt-4">
           <div className="mb-1">
-            <label className="text-gray-500"> House Address </label>
+            <label className="text-gray-500"> Delivery Address </label>
           </div>
           <Input
             className="w-full h-[48px] hover:border-green-500 active:border-green-600"
@@ -462,24 +465,26 @@ const DealsPage = () => {
           width={360}
         >
           <div className="items-center flex flex-col">
-          <div className="w-full justify-center text-center place-items-center">
-            <Lottie className="h-32" animationData={animationData2} />
-            <div className="flex flex-col text-center"><div className="text-center mt-4 text-[24px] font-medium boder-b leading-tight">
-              Order Placed Successfully
+            <div className="w-full justify-center text-center place-items-center">
+              <Lottie className="h-32" animationData={animationData2} />
+              <div className="flex flex-col text-center">
+                <div className="text-center mt-4 text-[24px] font-medium boder-b leading-tight">
+                  Order Placed Successfully
+                </div>
+                <p className="text-[14px] w-[75%] mt-2 m-auto text-gray-600 text-center">
+                  Our team will reach out to you in order to finalize your order
+                </p>
+              </div>
             </div>
-            <p className="text-[14px] w-[75%] mt-2 m-auto text-gray-600 text-center">
-              Our team will reach out to you in order to finalize your order
-            </p></div>
-          </div>
 
-          <div
-            onClick={() => {
-              setSuccess(false);
-            }}
-            className="mt-8 mb-4 text-green cursor-pointer"
-          >
-            Close
-          </div>
+            <div
+              onClick={() => {
+                setSuccess(false);
+              }}
+              className="mt-8 mb-4 text-green cursor-pointer"
+            >
+              Close
+            </div>
           </div>
         </Modal>
       )}

@@ -511,7 +511,7 @@ const AdminPage = () => {
           {/* Mobile Responsive Deals List */}
           <div className={`${!useDrawer && "hidden"} mt-4`}>
             {allDocs.map((product) => (
-              <div className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-4">
+              <div key={product.id} className="mx-[16px] flex items-center mt-3 bg-white rounded-lg px-4 py-4">
                 <div className="w-full">
                   <div className="flex items-center text-gray-700">
                     <div className="w-full truncate text-[20px] font-medium mb-1">
@@ -618,8 +618,8 @@ const AdminPage = () => {
                   .filter(
                     (order) => order.paid === false || order.delivered === false
                   )
-                  .map((order) => (
-                    <tr className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50">
+                  .map((order, index) => (
+                    <tr key={order[index]} className="bg-white border-b cursor-pointer border-slate-100 hover:bg-gray-50">
                       <td className="py-6 pl-4 text-gray-700">
                         {order.selectedProducts.map((product) => (
                           <div>{product.productName}</div>
