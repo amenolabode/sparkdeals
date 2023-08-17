@@ -3,9 +3,9 @@ import { Header } from "./components/header";
 import Lottie from "lottie-react";
 import animationData from "./assets/animation_llfho8x2.json";
 import { useNavigate } from "react-router-dom";
+import SparkFooter from "./components/footer";
 
 const Page404 = () => {
-    
   const navigate = useNavigate();
   return (
     <div className="bg-white h-screen">
@@ -15,12 +15,15 @@ const Page404 = () => {
         <p className="text-[36px] font-medium text-green">Page not found</p>
         <div
           className={`text-[18px] ${"bg-green hover:bg-[#0f5c2e] text-white"} text-[16px] mt-8 text-center cursor-pointer capitalize  px-8 py-4 rounded-md w-fit`}
-          onClick={() => {navigate("/")}}
+          onClick={() => {
+            navigate("/");
+          }}
         >
           {" "}
           Back to home
         </div>
       </div>
+      <SparkFooter />
     </div>
   );
 };

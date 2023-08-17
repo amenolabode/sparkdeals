@@ -9,6 +9,7 @@ import emailjs from "@emailjs/browser";
 import Lottie from "lottie-react";
 import animationData from "./assets/animation_lldyxh5j.json";
 import animationData2 from "./assets/animation_lle1e0mt.json";
+import SparkFooter from "./components/footer";
 
 const DealsPage = () => {
   const [openCheckOut, setOpenCheckOut] = useState(false);
@@ -394,7 +395,7 @@ const DealsPage = () => {
   };
 
   return (
-    <div className="pb-24 md:pb-8">
+    <div className="">
       <Header
         noInCart={selectedProducts.length}
         handleOpenCart={handleOpenCart}
@@ -521,6 +522,7 @@ const DealsPage = () => {
           </div>
         </Modal>
       )}
+      <SparkFooter />
     </div>
   );
 };

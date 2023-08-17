@@ -19,6 +19,7 @@ import {
   FaExclamationCircle,
   FaPlus,
 } from "react-icons/fa";
+import SparkFooter from "./components/footer";
 
 const AdminPage = () => {
   const [productName, setProductName] = useState("");
@@ -1010,6 +1011,7 @@ const AdminPage = () => {
           </div>
         </Drawer>
       )}
+      <SparkFooter />
     </div>
   );
 };
