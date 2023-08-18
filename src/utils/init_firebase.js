@@ -33,8 +33,9 @@ export const handleDeleteDoc = async (documentId) => {
   try {
     const documentRef = doc(db, "deals", documentId);
     await deleteDoc(documentRef);
+    return true;
   } catch (error) {
-    // return "Error deleting document: ", error;
+    return "Error deleting document", error;
   }
 };
 
@@ -61,51 +62,48 @@ export const handleFile = (image) => {
   });
 };
 
-export const handleSubmit = (
+export const handleSubmit = async (
   productName,
   oldPrice,
+  expiryDate,
+  startDate,
   newPrice,
   quantity,
   unit,
   discount,
-  startDate,
-  expiryDate,
-  imageFile,
-  paidAt,
-  deliveredAt
+  image,
+  deliveredAt,
+  paidAt
 ) => {
-  handleFile(imageFile)
-    .then((imageURL) => {
-      const collectionRef = collection(db, "deals");
-      addDoc(collectionRef, {
-        imageURL,
-        productName,
-        oldPrice,
-        expiryDate,
-        startDate,
-        currentPrice: newPrice,
-        availableQTY: quantity,
-        measurement: unit,
-        discount,
-        createdAt: serverTimestamp(),
-        paidAt,
-        deliveredAt,
-      }).then(() => {
-        return true;
-      });
-    })
-    .catch((error) => {
-      return error;
+  try {
+    const imageURL = await handleFile(image);
+    const collectionRef = collection(db, "deals");
+    await addDoc(collectionRef, {
+      imageURL,
+      productName,
+      oldPrice,
+      expiryDate,
+      startDate,
+      currentPrice: newPrice,
+      availableQTY: quantity,
+      measurement: unit,
+      discount,
+      createdAt: serverTimestamp(),
+      paidAt,
+      deliveredAt,
     });
+    return true; // Return true after the document is added successfully
+  } catch (error) {
+    console.error("Error submitting deal:", error);
+    return false; // Return false in case of an error
+  }
 };
 
 export const handleProcessingOrder = async (newOrder) => {
   try {
     const collectionRef = collection(db, "orders");
-
-    await addDoc(collectionRef, newOrder).then(() => {
-      return true;
-    });
+    await addDoc(collectionRef, newOrder);
+    return true;
   } catch (error) {
     // return "Error deleting document: ", error;
   }
@@ -117,9 +115,8 @@ export const handlePaymentUpdate = async (orderId) => {
     await updateDoc(orderRef, {
       paid: true,
       paidAt: serverTimestamp(),
-    }).then(() => {
-      return true;
     });
+    return true;
   } catch (error) {
     return error;
   }
@@ -131,15 +128,14 @@ export const handleDeliveryUpdate = async (orderId) => {
     await updateDoc(orderRef, {
       delivered: true,
       deliveredAt: serverTimestamp(),
-    }).then(() => {
-      return true;
     });
+    return true;
   } catch (error) {
     return error;
   }
 };
 
-export const useFetchData = (collectionName) => {
+export const useFetchData = (trigger,trigger2, trigger3, trigger4, trigger5, collectionName) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -153,7 +149,7 @@ export const useFetchData = (collectionName) => {
       setData(documents);
     };
     fetchData();
-  }, [collectionName]);
+  }, [trigger, trigger2, trigger3, trigger4, trigger5, collectionName]);
 
   return data;
 };

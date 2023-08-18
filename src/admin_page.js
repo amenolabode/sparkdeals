@@ -15,7 +15,10 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import SparkFooter from "./components/footer";
-import { setCookie } from "./utils/local_storage";
+import {
+  getSavedActivePageFromLocalStorage,
+  setCookie,
+} from "./utils/local_storage";
 import { AddDealForm } from "./components/admin_add_deal_form";
 
 const AdminPage = () => {
@@ -62,16 +65,31 @@ const AdminPage = () => {
     setLoading(false);
     setMenuToggle("");
     setMenuVisible(false);
+    setModalVisible(false);
   };
 
   const handlePageChange = (page) => {
     setActivePage(page);
-    setLocalState(page);
+    setCookie("page", page);
   };
 
   // Firebase  GET Functions
-  const orderDocs = useFetchData("orders");
-  const allDocs = useFetchData("deals");
+  const orderDocs = useFetchData(
+    openModal,
+    loading,
+    menuToggle,
+    menuVisible,
+    modalVisible,
+    "orders"
+  );
+  const allDocs = useFetchData(
+    openModal,
+    loading,
+    menuToggle,
+    menuVisible,
+    modalVisible,
+    "deals"
+  );
 
   // Firebase POST Functions Start
   const handleConfirmDelete = async () => {
@@ -82,10 +100,21 @@ const AdminPage = () => {
     }
   };
 
+  const resetFormVariables = () => {
+    setProductName("");
+    setOldPrice("");
+    setNewPrice("");
+    setQuantity("");
+    setUnit("");
+    setStartDate("");
+    setExpiryDate("");
+    setImage(null);
+  };
+
   const handleAddDeal = async () => {
-    const deliveredAt = ""
-    const paidAt = ""
-    
+    const deliveredAt = "";
+    const paidAt = "";
+    setLoading(true);
     const isSuccess = await handleSubmit(
       productName,
       oldPrice,
@@ -100,6 +129,7 @@ const AdminPage = () => {
       paidAt
     );
     if (isSuccess) {
+      resetFormVariables();
       handleCloseModals();
       alert("Deal Added Successfully");
     }
@@ -111,6 +141,7 @@ const AdminPage = () => {
 
     if (isSuccess) {
       handleCloseModals();
+      alert("Payment Updated");
     }
   };
 
@@ -119,14 +150,10 @@ const AdminPage = () => {
     const isSuccess = await handleDeliveryUpdate(orderId);
     if (isSuccess) {
       handleCloseModals();
+      alert("Order Delivered");
     }
   };
   // Firebase POST Functions End
-
-  // Local Storage
-  const setLocalState = (page) => {
-    setCookie(page, page);
-  };
 
   useEffect(() => {
     const savedPage = localStorage.getItem("page");
@@ -311,13 +338,12 @@ const AdminPage = () => {
                       }}
                     >
                       <FaEllipsisV />
-
                       {menuToggle === product.id
                         ? menuVisible && (
                             <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
                               <li
                                 onClick={() => {
-                                  handleOpenModal(product);
+                                  handleOpenModal("delete", product);
                                 }}
                                 className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
                               >
@@ -699,6 +725,8 @@ const AdminPage = () => {
             isAdditionValid={isAdditionValid}
             handleAddDeal={handleAddDeal}
             setImage={setImage}
+            loading={loading}
+            resetFormVariables={resetFormVariables}
           />
         </Modal>
       )}
@@ -733,11 +761,55 @@ const AdminPage = () => {
             isAdditionValid={isAdditionValid}
             handleAddDeal={handleAddDeal}
             setImage={setImage}
+            loading={loading}
+            resetFormVariables={resetFormVariables}
           />
         </Drawer>
       )}
 
-      {/* Delete Deal popup */}
+      {/* Success Deal popup */}
+      {modalVisible && openModal === "success" && (
+        <Modal
+          open={modalVisible}
+          onOk={handleOkAndCancel}
+          onCancel={handleOkAndCancel}
+          centered={true}
+          footer={false}
+          closable={true}
+          width={240}
+        >
+          {
+            <div className="w-full text-center place-items-center">
+              <FaExclamationCircle
+                size={32}
+                className="text-[#E71D36] w-full mt-8"
+              />
+              <div className="mt-4 text-base font-medium boder-b">
+                Delete {modalData.productName}?
+              </div>
+
+              <div className="w-full mt-8">
+                <div
+                  className="w-full text-[16px] text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] py-4 rounded-md text-white"
+                  onClick={() => {
+                    handleConfirmDelete();
+                  }}
+                >
+                  Delete
+                </div>
+                <div
+                  className="mt-6 cursor-pointer"
+                  onClick={() => handleOkAndCancel()}
+                >
+                  Cancel
+                </div>
+              </div>
+            </div>
+          }
+        </Modal>
+      )}
+
+      {/* Delete popup */}
       {modalVisible && openModal === "delete" && (
         <Modal
           open={modalVisible}
@@ -760,51 +832,19 @@ const AdminPage = () => {
 
               <div className=" mt-8">
                 <div
-                  className=" text-[16px] w-content text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
+                  className=" text-[16px] w-full text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white"
                   onClick={() => {
-                    handleConfirmDelete();
+                    handleConfirmDelete(modalData.id);
                   }}
                 >
                   Delete
                 </div>
-                <div className="mt-6 cursor-pointer">Cancel</div>
-              </div>
-            </div>
-          }
-        </Modal>
-      )}
-
-      {/* Success popup */}
-      {modalVisible && openModal === "success  " && (
-        <Modal
-          open={modalVisible}
-          onOk={handleOkAndCancel}
-          onCancel={handleOkAndCancel}
-          centered={true}
-          footer={false}
-          closable={true}
-          width={240}
-        >
-          {
-            <div className="w-full text-center place-items-center">
-              <FaExclamationCircle
-                size={32}
-                className="text-[#E71D36] w-full mt-8"
-              />
-              <div className="mt-4 text-base font-medium boder-b">
-                Delete {modalData.productName}?
-              </div>
-
-              <div className=" mt-8">
                 <div
-                  className=" text-[16px] w-content text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
-                  onClick={() => {
-                    handleDeleteDoc(modalData.id);
-                  }}
+                  className="mt-6 cursor-pointer"
+                  onClick={() => handleOkAndCancel()}
                 >
-                  Delete
+                  Cancel
                 </div>
-                <div className="mt-6 cursor-pointer">Cancel</div>
               </div>
             </div>
           }
@@ -823,7 +863,7 @@ const AdminPage = () => {
           title={<div className="text-[24px]">Completed Orders</div>}
           width={480}
         >
-          <div className="h-[75vh] overflow-y-auto">
+          <div className="h-[75vh] overflow-y-auto ">
             {orderDocs
               .filter(
                 (order) => order.paid !== false || order.delivered !== false

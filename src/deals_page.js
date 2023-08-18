@@ -133,6 +133,7 @@ const DealsPage = () => {
     setLoading(true);
     const isSuccess = await handleProcessingOrder(newOrder);
     if (isSuccess) {
+      console.log(isSuccess)
       setSelectedProducts([]);
       setAddress("");
       setEmail("");
@@ -141,13 +142,13 @@ const DealsPage = () => {
       setOpenCheckOut(false);
       setSuccess(true);
       setLoading(false);
-      setModalView("cart");
-      submitEmailHandler(newOrder);
+      setModalView("");
+      // submitEmailHandler(newOrder);
       clearCart();
     }
   };
 
-  const allDocs = useFetchData("deals");
+  const allDocs = useFetchData(modalView, "deals");
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");

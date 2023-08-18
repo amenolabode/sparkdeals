@@ -17,6 +17,8 @@ export const AddDealForm = ({
   isAdditionValid,
   handleAddDeal,
   setImage,
+  loading,
+  resetFormVariables
 }) => {
   return (
     <div className="mx-auto">
@@ -92,12 +94,12 @@ export const AddDealForm = ({
           onChange={(e) => setUnit(e.target.value)}
         >
           <option value="">Select Unit</option>
-          <option value="Kg">Kg</option>
-          <option value="Bags">Bags</option>
-          <option value="Pieces">Pieces</option>
-          <option value="Keg">Keg</option>
-          <option value="Pack">Pack</option>
-          <option value="Box">Box</option>
+          <option value="Kg(s)">Kg</option>
+          <option value="Bag(s)">Bag</option>
+          <option value="Pieces">Piece</option>
+          <option value="Gallon(s)">Gallon</option>
+          <option value="Pack(s)">Pack</option>
+          <option value="Box(es)">Box</option>
         </select>
       </div>
 
@@ -129,7 +131,7 @@ export const AddDealForm = ({
         onClick={isAdditionValid ? handleAddDeal : undefined}
       >
         {" "}
-        Add Deal
+        {loading ? "Adding Deal..." : "Add Deal"}
       </div>
     </div>
   );
