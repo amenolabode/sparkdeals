@@ -16,7 +16,7 @@ const ProductCard = ({
 
   return (
     <div
-      className={`bg-white min-w-130 h-[500px] md:h-auto p-[8px] rounded-lg ${classExtra}`}
+      className={`bg-white min-w-130 h-[50z0px] md:h-auto p-[8px] rounded-lg ${classExtra}`}
     >
       <div className="h-[35%] md:h-[400px] mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-md">
         <img src={image} alt="" className="h-full w-full object-cover " />

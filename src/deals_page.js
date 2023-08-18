@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/product_display";
 import { Modal, Input, Drawer } from "antd";
-import { FaCheckCircle, FaMinusCircle, FaPlusCircle } from "react-icons/fa";
+import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { collection, getDocs, addDoc } from "firebase/firestore";
-import { db } from "./utils/init_firebase";
 import emailjs from "@emailjs/browser";
 import Lottie from "lottie-react";
 import animationData from "./assets/animation_lldyxh5j.json";
 import animationData2 from "./assets/animation_lle1e0mt.json";
 import SparkFooter from "./components/footer";
+import { setCookie } from "./utils/local_storage";
+import { handleProcessingOrder, useFetchData } from "./utils/init_firebase";
+import { sendEmail } from "./utils/send_email";
 
 const DealsPage = () => {
   const [openCheckOut, setOpenCheckOut] = useState(false);
@@ -19,23 +21,12 @@ const DealsPage = () => {
   const [userPhone, setPhone] = useState("");
   const [userEmail, setEmail] = useState("");
   const [userAddress, setAddress] = useState("");
-  const [allDocs, setAllDocs] = useState([]);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [useDrawer, setUseDrawer] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const paid = false;
   const delivered = false;
-
-  const isCheckOutValid =
-    userAddress !== "" &&
-    userName !== "" &&
-    userPhone !== "" &&
-    selectedProducts.length !== 0;
-
-  const handleOpenCart = () => {
-    setOpenCheckOut(true);
-  };
 
   const handleProductClick = (product) => {
     const productExists = selectedProducts.some(
@@ -55,55 +46,24 @@ const DealsPage = () => {
     ];
 
     // Save cart data to localStorage
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-
+    setCookie("cart", updatedCart);
     setOpenCheckOut(true);
   };
 
-  const submitEmailHandler = () => {
-    const emailData = {
-      user_name: userName,
-      user_email: userEmail,
-      message: generateEmailMessage(),
-    };
-
-    emailjs
-      .send(
-        "service_vtcz456",
-        "template_zco880e",
-        emailData,
-        "tmnsvtTFyEkOyaF5Q"
-      )
-      .then(
-        (result) => {
-          console.log(result.text);
-        },
-        (error) => {
-          console.log(error.text);
-        }
+  const submitEmailHandler = async () => {
+    try {
+      await sendEmail(
+        userName,
+        userEmail,
+        selectedProducts,
+        totalValue,
+        userPhone,
+        userAddress
       );
-  };
-
-  const generateEmailMessage = () => {
-    let message = "Order Details:\n";
-    selectedProducts.forEach((product) => {
-      message += `
-          ${product.productName} - ${product.value} ${product.measurement}
-        
-      `;
-    });
-
-    message += `\nTotal: GH₵ ${totalValue}\n
-    
-    `;
-
-    message += `\nBuyer Details\n`;
-    message += `\nName ${userName}\n`;
-    message += `\nEmail: ${userEmail}\n`;
-    message += `\nPhone: ${userPhone}\n`;
-    message += `\nDelivery Address: ${userAddress}\n`;
-
-    return message;
+      console.log("Email sent successfully!");
+    } catch (error) {
+      console.log("Error sending email:", error);
+    }
   };
 
   const handleRemoveProduct = (productId) => {
@@ -112,14 +72,23 @@ const DealsPage = () => {
     );
   };
 
-  const handleOk = () => {
+  const handleOkAndCancel = () => {
     setOpenCheckOut(false);
     setModalView("cart");
   };
 
-  const handleCancel = () => {
+  const handle = () => {
     setOpenCheckOut(false);
     setModalView("cart");
+  };
+
+  const handleChange = (e, index) => {
+    const inputValue = e.target.value;
+    setSelectedProducts((prevProducts) => {
+      const updatedProducts = [...prevProducts];
+      updatedProducts[index].value = inputValue;
+      return updatedProducts;
+    });
   };
 
   const addItem = (index, quantity) => {
@@ -151,24 +120,19 @@ const DealsPage = () => {
   );
 
   const handleProcessOrder = async () => {
-    try {
-      setLoading(true);
-
-      const collectionRef = collection(db, "orders");
-
-      const newOrder = {
-        totalValue,
-        selectedProducts,
-        userName,
-        userEmail,
-        userPhone,
-        userAddress,
-        paid,
-        delivered,
-      };
-
-      await addDoc(collectionRef, newOrder);
-
+    const newOrder = {
+      totalValue,
+      selectedProducts,
+      userName,
+      userEmail,
+      userPhone,
+      userAddress,
+      paid,
+      delivered,
+    };
+    setLoading(true);
+    const isSuccess = await handleProcessingOrder(newOrder);
+    if (isSuccess) {
       setSelectedProducts([]);
       setAddress("");
       setEmail("");
@@ -178,39 +142,12 @@ const DealsPage = () => {
       setSuccess(true);
       setLoading(false);
       setModalView("cart");
-
       submitEmailHandler(newOrder);
       clearCart();
-    } catch (error) {
-      console.error("Error placing order:", error);
-      setLoading(false);
     }
   };
 
-  const handleChange = (e, index) => {
-    const inputValue = e.target.value;
-    setSelectedProducts((prevProducts) => {
-      const updatedProducts = [...prevProducts];
-      updatedProducts[index].value = inputValue;
-      return updatedProducts;
-    });
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const dealsRef = collection(db, "deals");
-      const querySnapshot = await getDocs(dealsRef);
-
-      const documents = [];
-      querySnapshot.forEach((doc) => {
-        documents.push({ id: doc.id, ...doc.data() });
-      });
-
-      setAllDocs(documents);
-    };
-
-    fetchData();
-  }, []);
+  const allDocs = useFetchData("deals");
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
@@ -240,6 +177,8 @@ const DealsPage = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, [screenWidth]);
+
+ 
 
   const displayCart = () => {
     return (
@@ -300,7 +239,7 @@ const DealsPage = () => {
         </div>
         <div
           className="cursor-pointer text-green mt-2 w-full text-center"
-          onClick={handleOk}
+          onClick={handleOkAndCancel}
         >
           {selectedProducts.length === 0
             ? "Add an item to cart"
@@ -415,11 +354,18 @@ const DealsPage = () => {
     );
   };
 
+   // Validation
+   const isCheckOutValid =
+   userAddress !== "" &&
+   userName !== "" &&
+   userPhone !== "" &&
+   selectedProducts.length !== 0;
+
   return (
     <div className="">
       <Header
         noInCart={selectedProducts.length}
-        handleOpenCart={handleOpenCart}
+        handleOpenCart={() => setOpenCheckOut(true)}
       />
       <div className="mx-[16px] md:mx-[64px] bg-white flex justify-between mt-4 md:mt-32 py-4 items-center px-[16px] md:px-[32px] rounded-lg">
         <h2 className="text-[18px] md:text-[32px] font-semibold text-gray-700">
@@ -471,7 +417,7 @@ const DealsPage = () => {
         <Drawer
           placement="bottom"
           closable={false}
-          onClose={handleCancel}
+          onClose={handle}
           key="bottom"
           className="rounded-t-xl"
           height="90%"
@@ -491,8 +437,8 @@ const DealsPage = () => {
       {!useDrawer && openCheckOut && (
         <Modal
           open={openCheckOut}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          onOk={handleOkAndCancel}
+          onCancel={handle}
           centered={true}
           footer={false}
           closable={true}
@@ -512,8 +458,8 @@ const DealsPage = () => {
       {success && (
         <Modal
           open={success}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          onOk={handleOkAndCancel}
+          onCancel={handle}
           centered={true}
           footer={false}
           closable={true}

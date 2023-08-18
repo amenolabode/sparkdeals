@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
-import Input from "antd/es/input/Input";
-import { addDoc } from "firebase/firestore";
 import {
-  collection,
-  doc,
-  deleteDoc,
-  getDocs,
-  updateDoc,
-} from "firebase/firestore";
-import { db, storage } from "./utils/init_firebase";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { v4 } from "uuid";
-import { Modal, Drawer, DatePicker } from "antd";
+  handleDeleteDoc,
+  handleDeliveryUpdate,
+  handlePaymentUpdate,
+  handleSubmit,
+  useFetchData,
+} from "./utils/init_firebase";
+import { Modal, Drawer } from "antd";
 import {
   FaChevronCircleUp,
   FaEllipsisV,
@@ -20,6 +15,8 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import SparkFooter from "./components/footer";
+import { setCookie } from "./utils/local_storage";
+import { AddDealForm } from "./components/admin_add_deal_form";
 
 const AdminPage = () => {
   const [productName, setProductName] = useState("");
@@ -29,8 +26,6 @@ const AdminPage = () => {
   const [unit, setUnit] = useState("");
   const [image, setImage] = useState(null);
   const [openModal, setOpenModal] = useState("");
-  const [allDocs, setAllDocs] = useState([]);
-  const [orderDocs, setOrderDocs] = useState([]);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [useDrawer, setUseDrawer] = useState(false);
   const [activePage, setActivePage] = useState("deals");
@@ -42,6 +37,7 @@ const AdminPage = () => {
   const [modalData, setModalData] = useState("");
   const [showDetails, setShowDetails] = useState(false);
   const [loading, setLoading] = useState(false);
+  const discount = Math.floor(100 - (newPrice / oldPrice) * 100);
 
   const handleSetMenuToggle = (value) => {
     if (menuToggle === value) {
@@ -50,135 +46,85 @@ const AdminPage = () => {
       setMenuToggle(value);
     }
   };
-  const handleOpenDeleteModal = (data) => {
-    setOpenModal("delete");
+  const handleOpenModal = (modalName, data) => {
+    setOpenModal(modalName);
     setModalVisible(true);
     setModalData(data);
   };
 
-  const handleOpenHistory = () => {
-    setOpenModal("history");
-    setModalVisible(true);
-    // setModalData(data);
-  };
-
-  const handleStartDateChange = (dateString) => {
-    setStartDate(dateString);
-  };
-  const handleEndDateChange = (dateString) => {
-    setExpiryDate(dateString);
-  };
-
-  const handleOk = () => {
+  const handleOkAndCancel = () => {
     setOpenModal("");
     setModalVisible(false);
   };
 
-  const handleCancel = () => {
-    setOpenModal(false);
-    setModalVisible(false);
-  };
-
-  const handleDeleteDoc = async (documentId) => {
-    try {
-      const documentRef = doc(db, "deals", documentId);
-      await deleteDoc(documentRef);
-      setMenuVisible(false);
-      setModalVisible(false);
-      setOpenModal("");
-    } catch (error) {
-      console.error("Error deleting document: ", error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const ordersRef = collection(db, "orders");
-      const querySnapshot = await getDocs(ordersRef);
-      const documents = [];
-      querySnapshot.forEach((doc) => {
-        documents.push({ id: doc.id, ...doc.data() });
-      });
-      setOrderDocs(documents);
-    };
-    fetchData();
-  }, [openModal, productName, loading]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const dealsRef = collection(db, "deals");
-      const querySnapshot = await getDocs(dealsRef);
-      const documents = [];
-      querySnapshot.forEach((doc) => {
-        documents.push({ id: doc.id, ...doc.data() });
-      });
-      setAllDocs(documents);
-    };
-    fetchData();
-  }, [openModal, productName, loading]);
-
-  const handleFile = () => {
-    return new Promise((resolve, reject) => {
-      if (image == null) {
-        reject("No image to upload");
-        return;
-      }
-      const imageRef = ref(storage, `/images/${image.name + v4()}`);
-      uploadBytes(imageRef, image)
-        .then(() => {
-          getDownloadURL(imageRef)
-            .then((downloadURL) => {
-              resolve(downloadURL);
-            })
-            .catch((error) => {
-              reject(error);
-            });
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  };
-
-  const discount = Math.floor(100 - (newPrice / oldPrice) * 100);
-
-  const handlePaymentUpdate = async (orderId) => {
-    try {
-      setLoading(true);
-      const orderRef = doc(db, "orders", orderId);
-      await updateDoc(orderRef, {
-        paid: true,
-      });
-
-      setLoading(false);
-      setMenuToggle("");
-      setMenuVisible(false);
-    } catch (error) {
-      console.error("Error updating payment:", error);
-    }
-  };
-  const handleDeliveryUpdate = async (orderId) => {
-    try {
-      setLoading(true);
-      const orderRef = doc(db, "orders", orderId);
-      await updateDoc(orderRef, {
-        delivered: true,
-      });
-      setLoading(false);
-      setMenuToggle("");
-      setMenuVisible(false);
-    } catch (error) {
-      console.error("Error updating payment:", error);
-    }
-  };
-
-  const setLocalState = (page) => {
-    localStorage.setItem("page", JSON.stringify(page));
+  const handleCloseModals = () => {
+    setOpenModal("");
+    setLoading(false);
+    setMenuToggle("");
+    setMenuVisible(false);
   };
 
   const handlePageChange = (page) => {
     setActivePage(page);
     setLocalState(page);
+  };
+
+  // Firebase  GET Functions
+  const orderDocs = useFetchData("orders");
+  const allDocs = useFetchData("deals");
+
+  // Firebase POST Functions Start
+  const handleConfirmDelete = async () => {
+    const isSuccess = await handleDeleteDoc(modalData.id);
+    if (isSuccess) {
+      handleCloseModals();
+    } else {
+    }
+  };
+
+  const handleAddDeal = async () => {
+    const isSuccess = await handleSubmit(
+      productName,
+      oldPrice,
+      expiryDate,
+      startDate,
+      newPrice,
+      quantity,
+      unit,
+      discount,
+      image
+    );
+    if (isSuccess) {
+      handleCloseModals();
+      alert("Deal Added Successfully");
+    }
+  };
+
+  const upDatePaymentStatus = async (orderId) => {
+    setLoading(true);
+    const isSuccess = await handlePaymentUpdate(orderId);
+
+    if (isSuccess) {
+      setLoading(false);
+      setMenuToggle("");
+      setMenuVisible(false);
+    }
+  };
+
+  const updateDeliveryUpdate = async (orderId) => {
+    setLoading(true);
+    const isSuccess = await handleDeliveryUpdate(orderId);
+    if (isSuccess) {
+      setLoading(false);
+      setMenuToggle("");
+      setMenuVisible(false);
+    }
+  };
+  // Firebase POST Functions End
+
+  // Local Storage
+  const setLocalState = (page) => {
+    setCookie(page, page);
   };
 
   useEffect(() => {
@@ -188,36 +134,7 @@ const AdminPage = () => {
     }
   }, []);
 
-  const handleSubmit = () => {
-    handleFile()
-      .then((imageURL) => {
-        const collectionRef = collection(db, "deals");
-        addDoc(collectionRef, {
-          imageURL,
-          productName,
-          oldPrice,
-          expiryDate,
-          startDate,
-          currentPrice: newPrice,
-          availableQTY: quantity,
-          measurement: unit,
-          discount,
-        }).then(() => {
-          setProductName("");
-          setOldPrice(0);
-          setNewPrice(0);
-          setQuantity(0);
-          setUnit("");
-          setImage(null);
-          alert("Deal Added Successfully");
-        });
-      })
-      .catch((error) => {
-        // console.error("Error handling file:", error);
-      });
-    setOpenModal("");
-  };
-
+  // Check Window Size and Resize
   useEffect(() => {
     function handleResize() {
       setScreenWidth(window.innerWidth);
@@ -244,6 +161,7 @@ const AdminPage = () => {
     return formattedDate;
   };
 
+  // Validation
   const isAdditionValid =
     productName !== "" &&
     oldPrice !== 0 &&
@@ -253,124 +171,6 @@ const AdminPage = () => {
     image !== null &&
     expiryDate !== "" &&
     startDate !== "";
-
-  const AddDealForm = () => {
-    return (
-      <div className="mx-auto">
-        <div className="mt-4">
-          <div className="mb-1">
-            <label className="text-gray-500">Product Image</label>
-          </div>
-          <Input
-            type="file"
-            name="image"
-            onChange={(e) => {
-              setImage(e.target.files[0]);
-            }}
-          ></Input>
-        </div>
-
-        <div className="mt-4">
-          <div className="mb-1">
-            <label className="text-gray-500"> Product Name</label>
-          </div>
-          <Input
-            className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-            placeholder="Please enter Product Name"
-            value={productName}
-            required={true}
-            onChange={(e) => setProductName(e.target.value)}
-          />
-        </div>
-        <div className="mt-4">
-          <div className="mb-1">
-            <label className="text-gray-500"> Old (Market) Price </label>
-          </div>
-          <Input
-            className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-            placeholder="Old Price"
-            value={oldPrice}
-            required={true}
-            onChange={(e) => setOldPrice(e.target.value)}
-          />
-        </div>
-        <div className="mt-4">
-          <div className="mb-1">
-            <label className="text-gray-500"> New (Spark) Price </label>
-          </div>
-          <Input
-            className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-            placeholder="New Price"
-            value={newPrice}
-            required={true}
-            onChange={(e) => setNewPrice(e.target.value)}
-          />
-        </div>
-        <div className="mt-4">
-          <div className="mb-1">
-            <label className="text-gray-500"> Available Quantity </label>
-          </div>
-          <Input
-            className="w-full h-[48px] hover:border-green-500 active:border-green-600"
-            placeholder="Available Quantity"
-            value={quantity}
-            required={true}
-            onChange={(e) => setQuantity(e.target.value)}
-          />
-        </div>
-        <div className="mt-4">
-          <div className="mb-1">
-            <label className="text-gray-500"> Unit (Kg, Pieces, Packs) </label>
-          </div>
-          <select
-            className="w-full px-2 rounded-md h-[48px] border hover:border-green-500 active:border-green-600"
-            value={unit}
-            required={true}
-            onChange={(e) => setUnit(e.target.value)}
-          >
-            <option value="">Select Unit</option>
-            <option value="Kg">Kg</option>
-            <option value="Bags">Bags</option>
-            <option value="Pieces">Pieces</option>
-            <option value="Keg">Keg</option>
-            <option value="Pack">Pack</option>
-            <option value="Box">Box</option>
-          </select>
-        </div>
-
-        <div className="mt-4">
-          <div className="mb-1">
-            <label className="text-gray-500"> Deal Start Date</label>
-          </div>
-          <DatePicker
-            className="w-full h-[48px]"
-            onChange={(date, dateString) => handleStartDateChange(dateString)}
-          />
-        </div>
-        <div className="mt-4">
-          <div className="mb-1">
-            <label className="text-gray-500"> Deal Expiry Date</label>
-          </div>
-          <DatePicker
-            className="w-full h-[48px]"
-            onChange={(date, dateString) => handleEndDateChange(dateString)}
-          />
-        </div>
-
-        <div
-          className={`${
-            isAdditionValid
-              ? "bg-green hover:bg-[#0f5c2e] text-white"
-              : "bg-gray-200 text-gray-500"
-          } text-[16px] w-full mt-8 text-center cursor-pointer capitalize  px-8 py-4 rounded-md w-fit`}
-          onClick={isAdditionValid ? handleSubmit : undefined}
-        >
-          {" "}
-          Add Deal
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div>
@@ -430,7 +230,7 @@ const AdminPage = () => {
           </div>
         </div>
         <div
-          onClick={() => handleOpenHistory()}
+          onClick={() => handleOpenModal("history", allDocs)}
           className="cursor-pointer text-green"
         >
           view history
@@ -516,7 +316,7 @@ const AdminPage = () => {
                             <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
                               <li
                                 onClick={() => {
-                                  handleOpenDeleteModal(product);
+                                  handleOpenModal(product);
                                 }}
                                 className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
                               >
@@ -557,7 +357,7 @@ const AdminPage = () => {
                           <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
                             <li
                               onClick={() => {
-                                handleOpenDeleteModal(product);
+                                handleOpenModal(product);
                               }}
                               className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
                             >
@@ -666,7 +466,9 @@ const AdminPage = () => {
                           <div>{product.value}</div>
                         ))}
                       </td>
-                      <td className="py-4 text-gray-700">GH₵ {order.totalValue}</td>
+                      <td className="py-4 text-gray-700">
+                        GH₵ {order.totalValue}
+                      </td>
                       <td className="text-center text-gray-700">
                         {order.userName}
                       </td>
@@ -713,7 +515,7 @@ const AdminPage = () => {
                             <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
                               <li
                                 onClick={() => {
-                                  handlePaymentUpdate(order.id);
+                                  upDatePaymentStatus(order.id);
                                 }}
                                 className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
                               >
@@ -721,7 +523,7 @@ const AdminPage = () => {
                               </li>
                               <li
                                 onClick={() => {
-                                  handleDeliveryUpdate(order.id);
+                                  updateDeliveryUpdate(order.id);
                                 }}
                                 className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
                               >
@@ -767,7 +569,7 @@ const AdminPage = () => {
                               <ul className="absolute right-12 z-10 py-2 mt-2 bg-white border rounded-md shadow-md">
                                 <li
                                   onClick={() => {
-                                    handlePaymentUpdate(order);
+                                    upDatePaymentStatus(order);
                                   }}
                                   className="px-4 py-2 font-medium text-gray-700 border-b hover:bg-gray-100"
                                 >
@@ -870,15 +672,33 @@ const AdminPage = () => {
       {modalVisible && openModal === "addDeal" && !useDrawer && (
         <Modal
           open={modalVisible}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          onOk={handleOkAndCancel}
+          onCancel={handleOkAndCancel}
           centered={true}
           footer={false}
           closable={true}
           title={<div className="text-[24px]">Add New Deal</div>}
           width={480}
         >
-          {AddDealForm()}
+          <AddDealForm
+            productName={productName}
+            setProductName={setProductName}
+            oldPrice={oldPrice}
+            setOldPrice={setOldPrice}
+            newPrice={newPrice}
+            setNewPrice={setNewPrice}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            unit={unit}
+            setUnit={setUnit}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            expiryDate={expiryDate}
+            setExpiryDate={setExpiryDate}
+            isAdditionValid={isAdditionValid}
+            handleAddDeal={handleAddDeal}
+            setImage={setImage}
+          />
         </Modal>
       )}
 
@@ -887,14 +707,32 @@ const AdminPage = () => {
         <Drawer
           placement="bottom"
           closable={false}
-          onClose={handleCancel}
+          onClose={handleOkAndCancel}
           key="bottom"
           className="rounded-t-xl"
           height="90%"
           open={modalVisible}
           title={<div className="text-[24px]">Add New Deal</div>}
         >
-          {AddDealForm()}
+          <AddDealForm
+            productName={productName}
+            setProductName={setProductName}
+            oldPrice={oldPrice}
+            setOldPrice={setOldPrice}
+            newPrice={newPrice}
+            setNewPrice={setNewPrice}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            unit={unit}
+            setUnit={setUnit}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            expiryDate={expiryDate}
+            setExpiryDate={setExpiryDate}
+            isAdditionValid={isAdditionValid}
+            handleAddDeal={handleAddDeal}
+            setImage={setImage}
+          />
         </Drawer>
       )}
 
@@ -902,8 +740,8 @@ const AdminPage = () => {
       {modalVisible && openModal === "delete" && (
         <Modal
           open={modalVisible}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          onOk={handleOkAndCancel}
+          onCancel={handleOkAndCancel}
           centered={true}
           footer={false}
           closable={true}
@@ -921,9 +759,9 @@ const AdminPage = () => {
 
               <div className=" mt-8">
                 <div
-                  className="w-full text-[16px] w-content text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
+                  className=" text-[16px] w-content text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
                   onClick={() => {
-                    handleDeleteDoc(modalData.id);
+                    handleConfirmDelete();
                   }}
                 >
                   Delete
@@ -939,8 +777,8 @@ const AdminPage = () => {
       {modalVisible && openModal === "success  " && (
         <Modal
           open={modalVisible}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          onOk={handleOkAndCancel}
+          onCancel={handleOkAndCancel}
           centered={true}
           footer={false}
           closable={true}
@@ -958,7 +796,7 @@ const AdminPage = () => {
 
               <div className=" mt-8">
                 <div
-                  className="w-full text-[16px] w-content text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
+                  className=" text-[16px] w-content text-center cursor-pointer capitalize bg-green hover:bg-[#0f5c2e] px-8 py-4 rounded-md text-white w-fit"
                   onClick={() => {
                     handleDeleteDoc(modalData.id);
                   }}
@@ -976,8 +814,8 @@ const AdminPage = () => {
       {modalVisible && openModal === "history" && !useDrawer && (
         <Modal
           open={modalVisible}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          onOk={handleOkAndCancel}
+          onCancel={handleOkAndCancel}
           centered={true}
           footer={false}
           closable={true}
@@ -1012,7 +850,7 @@ const AdminPage = () => {
         <Drawer
           placement="bottom"
           closable={false}
-          onClose={handleCancel}
+          onClose={handleOkAndCancel}
           key="bottom"
           className="rounded-t-xl"
           height="90%"
