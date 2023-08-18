@@ -135,7 +135,7 @@ export const handleDeliveryUpdate = async (orderId) => {
   }
 };
 
-export const useFetchData = (trigger,trigger2, trigger3, trigger4, trigger5, collectionName) => {
+export const useFetchData = (trigger, collectionName) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -149,7 +149,7 @@ export const useFetchData = (trigger,trigger2, trigger3, trigger4, trigger5, col
       setData(documents);
     };
     fetchData();
-  }, [trigger, trigger2, trigger3, trigger4, trigger5, collectionName]);
+  }, [trigger,  collectionName]);
 
   return data;
 };

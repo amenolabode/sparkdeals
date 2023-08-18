@@ -74,22 +74,8 @@ const AdminPage = () => {
   };
 
   // Firebase  GET Functions
-  const orderDocs = useFetchData(
-    openModal,
-    loading,
-    menuToggle,
-    menuVisible,
-    modalVisible,
-    "orders"
-  );
-  const allDocs = useFetchData(
-    openModal,
-    loading,
-    menuToggle,
-    menuVisible,
-    modalVisible,
-    "deals"
-  );
+  const orderDocs = useFetchData(openModal,  "orders");
+  const allDocs = useFetchData(openModal, "deals");
 
   // Firebase POST Functions Start
   const handleConfirmDelete = async () => {
