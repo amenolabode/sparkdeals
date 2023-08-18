@@ -619,13 +619,19 @@ const AdminPage = () => {
                   </th>
 
                   <th scope="col" className="py-4 font-normal ">
-                    Quantity
+                    Qty
+                  </th>
+                  <th scope="col" className="py-4 font-normal ">
+                    Amount
                   </th>
                   <th scope="col" className="px-4 py-4 font-normal text-center">
                     User
                   </th>
                   <th scope="col" className="px-2 py-4 font-normal text-center">
                     Phone
+                  </th>
+                  <th scope="col" className="px-2 py-4 font-normal text-center">
+                    Address
                   </th>
                   <th scope="col" className="px-2 py-4 font-normal text-center">
                     Details
@@ -660,11 +666,15 @@ const AdminPage = () => {
                           <div>{product.value}</div>
                         ))}
                       </td>
+                      <td className="py-4 text-gray-700">GH₵ {order.totalValue}</td>
                       <td className="text-center text-gray-700">
                         {order.userName}
                       </td>
                       <td className="px-4 py-4 text-center text-gray-700">
                         {order.userPhone}
+                      </td>
+                      <td className="truncate px-4 py-4 text-center text-gray-700">
+                        {order.userAddress}
                       </td>
                       <td className="px-4 py-4 text-center text-gray-700">
                         <div className="flex text-[12px] gap-1 mt-3 justify-center">

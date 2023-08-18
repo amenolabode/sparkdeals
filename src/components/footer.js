@@ -4,7 +4,7 @@ import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
 
 const SparkFooter = () => {
   return (
-    <div className="mt-24 p-[64px]">
+    <div className="mt-24 p-[16px] md:p-[64px]">
       <Divider className="bg-[#bdbdbd]" />
       <div className="flex mt-24">
         {/* <div className="w-2/3">
@@ -17,7 +17,7 @@ const SparkFooter = () => {
           <FaLinkedin size={24} color={`#5eba48`} />
         </div>
       </div>
-      <div className="w-1/3 mt-12 text-gray-700">
+      <div className="w-[90%] md:w-1/3 mt-12 text-gray-700 mb-24 md:mb-0">
         Use of this Website implies an acceptance of our{" "}
         <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a> . Spark
         is a service of FiClub Inc. and its subsidiaries.
