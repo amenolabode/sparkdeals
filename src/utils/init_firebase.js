@@ -70,7 +70,9 @@ export const handleSubmit = (
   discount,
   startDate,
   expiryDate,
-  imageFile
+  imageFile,
+  paidAt,
+  deliveredAt
 ) => {
   handleFile(imageFile)
     .then((imageURL) => {
@@ -86,6 +88,8 @@ export const handleSubmit = (
         measurement: unit,
         discount,
         createdAt: serverTimestamp(),
+        paidAt,
+        deliveredAt,
       }).then(() => {
         return true;
       });
@@ -112,6 +116,7 @@ export const handlePaymentUpdate = async (orderId) => {
     const orderRef = doc(db, "orders", orderId);
     await updateDoc(orderRef, {
       paid: true,
+      paidAt: serverTimestamp(),
     }).then(() => {
       return true;
     });
@@ -125,6 +130,7 @@ export const handleDeliveryUpdate = async (orderId) => {
     const orderRef = doc(db, "orders", orderId);
     await updateDoc(orderRef, {
       delivered: true,
+      deliveredAt: serverTimestamp(),
     }).then(() => {
       return true;
     });

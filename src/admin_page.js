@@ -83,6 +83,9 @@ const AdminPage = () => {
   };
 
   const handleAddDeal = async () => {
+    const deliveredAt = ""
+    const paidAt = ""
+    
     const isSuccess = await handleSubmit(
       productName,
       oldPrice,
@@ -92,7 +95,9 @@ const AdminPage = () => {
       quantity,
       unit,
       discount,
-      image
+      image,
+      deliveredAt,
+      paidAt
     );
     if (isSuccess) {
       handleCloseModals();
@@ -105,9 +110,7 @@ const AdminPage = () => {
     const isSuccess = await handlePaymentUpdate(orderId);
 
     if (isSuccess) {
-      setLoading(false);
-      setMenuToggle("");
-      setMenuVisible(false);
+      handleCloseModals();
     }
   };
 
@@ -115,9 +118,7 @@ const AdminPage = () => {
     setLoading(true);
     const isSuccess = await handleDeliveryUpdate(orderId);
     if (isSuccess) {
-      setLoading(false);
-      setMenuToggle("");
-      setMenuVisible(false);
+      handleCloseModals();
     }
   };
   // Firebase POST Functions End
