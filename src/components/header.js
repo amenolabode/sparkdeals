@@ -54,7 +54,7 @@ export const Header = ({ noInCart, handleOpenCart }) => {
   };
 
   return (
-    <div className="md:fixed items-center top-0 z-50 flex flex-col w-full h-auto border-b border-[#FAFAFA]/[.20]">
+    <div className="fixed items-center top-0 z-50 flex flex-col w-full h-auto border-b border-[#FAFAFA]/[.20]">
       <div className="flex md:justify-between w-full md:px-[64px] h-[88px] py-[16px] bg-white max-w-[2880px] items-center">
         {/* <HiMenu
           className="text-xl md:hidden ml-[16px]"
@@ -69,7 +69,7 @@ export const Header = ({ noInCart, handleOpenCart }) => {
         >
           {MobileSideNavItems(handleOpenCart)}
         </Drawer>
-        <div className="w-full md:w-fit">
+        <div className="flex items-center w-full md:w-fit">
           <img
             src="./assets/logo.png"
             alt=""
@@ -78,6 +78,7 @@ export const Header = ({ noInCart, handleOpenCart }) => {
               handleLinkClick("/");
             }}
           />
+          <p className="text-green ml-2">DEALS</p>
         </div>
 
         <div className="flex text-black items-center space-x-8 justify-end text-[16px] font-[400]">

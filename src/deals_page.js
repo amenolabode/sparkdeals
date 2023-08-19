@@ -371,13 +371,13 @@ const DealsPage = () => {
         noInCart={selectedProducts.length}
         handleOpenCart={() => setOpenCheckOut(true)}
       />
-      <div className="mx-[16px] md:mx-[64px] bg-white flex justify-between mt-4 md:mt-32 py-4 items-center px-[16px] md:px-[32px] rounded-lg">
-        <h2 className="text-[18px] md:text-[32px] font-semibold text-gray-700">
-          Spark Weekly Deals
+      <div className="hidden md:block mx-[16px] md:mx-[64px]  justify-between mt-24 md:mt-[120px] items-center px-[16px] md:px-[0px] rounded-lg">
+        <h2 className="text-[18px] md:text-[20px] font-semibold text-gray-700">
+           Weekly Deals
         </h2>
       </div>
       {allDocs.length === 0 && (
-        <div className="flex px-6 py-2 mb-8 space-x-4 animate-pulse mt-24">
+        <div className="mt-24 md:mt-0 flex px-6 py-2 mb-8 space-x-4 animate-pulse">
           <div className="flex-1 py-1 space-y-6">
             <div className="h-2 rounded bg-slate-200"></div>
             <div className="space-y-3">
@@ -397,7 +397,7 @@ const DealsPage = () => {
           </div>
         </div>
       )}
-      <div className="mx-[16px] b-[16px] md:m-[64px] grid grid-cols-2 md:grid-cols-3 gap-[16px] md:gap-8 mt-[16px] md:mt-4">
+      <div className="mt-24 mx-[16px] b-[16px] md:m-[64px] grid grid-cols-2 md:grid-cols-3 gap-[16px] md:gap-8 md:mt-4">
         {allDocs.map((product, index) => (
           <ProductCard
             key={index}
@@ -409,7 +409,7 @@ const DealsPage = () => {
             availaBleQTY={product.availableQTY}
             measurement={product.measurement}
             endDate={product.expiryDate}
-            classExtra={"mb-2 md:mb-8"}
+            classExtra={"mb-2 md:mb-2"}
             OnClick={() => {
               handleProductClick(product);
             }}
