@@ -15,10 +15,7 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import SparkFooter from "./components/footer";
-import {
-  getSavedActivePageFromLocalStorage,
-  setCookie,
-} from "./utils/local_storage";
+import { setCookie } from "./utils/local_storage";
 import { AddDealForm } from "./components/admin_add_deal_form";
 
 const AdminPage = () => {

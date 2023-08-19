@@ -7,10 +7,10 @@ import {
   FaTiktok,
   FaTwitter,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const SparkFooter = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   return (
     <div className="mt-24 p-[16px] md:p-[64px]">
       <Divider className="bg-[#bdbdbd]" />
