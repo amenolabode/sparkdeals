@@ -56,10 +56,10 @@ export const Header = ({ noInCart, handleOpenCart }) => {
   return (
     <div className="md:fixed items-center top-0 z-50 flex flex-col w-full h-auto border-b border-[#FAFAFA]/[.20]">
       <div className="flex md:justify-between w-full md:px-[64px] h-[88px] py-[16px] bg-white max-w-[2880px] items-center">
-        <HiMenu
+        {/* <HiMenu
           className="text-xl md:hidden ml-[16px]"
           onClick={() => setOpenNavBar(true)}
-        />
+        /> */}
         <Drawer
           open={openNavBar}
           placement="left"
