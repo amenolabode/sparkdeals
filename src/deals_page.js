@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/product_display";
 import { Modal, Input, Drawer } from "antd";
-import { FaMinusCircle, FaPlusCircle,  } from "react-icons/fa";
+import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import Lottie from "lottie-react";
 import animationData from "./assets/animation_lldyxh5j.json";
 import animationData2 from "./assets/animation_lle1e0mt.json";
@@ -194,7 +194,7 @@ const DealsPage = () => {
               className="relative flex items-center mt-3 bg-gray-100 rounded-lg px-4 py-2"
             >
               <FaPlusCircle
-                className="md:hidden rotate-45 text-red-900 absolute top-0 right-0 -mt-2 -mr-2 cursor-pointer"
+                className="lg:hidden rotate-45 text-red-900 absolute top-0 right-0 -mt-2 -mr-2 cursor-pointer"
                 size={18}
                 onClick={() => {
                   handleRemoveProduct(product.id);
@@ -231,7 +231,7 @@ const DealsPage = () => {
                 />
               </div>
               <p
-                className="hidden md:block cursor-pointer text-red-900 hover:text-red-500 text-[12px]"
+                className="hidden lg:block cursor-pointer text-red-900 hover:text-red-500 text-[12px]"
                 onClick={() => {
                   handleRemoveProduct(product.id);
                 }}
@@ -371,52 +371,54 @@ const DealsPage = () => {
         noInCart={selectedProducts.length}
         handleOpenCart={() => setOpenCheckOut(true)}
       />
-      <div className="hidden md:block mx-[16px] md:mx-[64px]  justify-between mt-24 md:mt-[120px] items-center px-[16px] md:px-[0px] rounded-lg">
-        <h2 className="text-[18px] md:text-[20px] font-semibold text-gray-700">
-           Weekly Deals
-        </h2>
-      </div>
-      {allDocs.length === 0 && (
-        <div className="mt-24 md:mt-0 flex px-6 py-2 mb-8 space-x-4 animate-pulse">
-          <div className="flex-1 py-1 space-y-6">
-            <div className="h-2 rounded bg-slate-200"></div>
-            <div className="space-y-3">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="h-2 col-span-2 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-              </div>
+      <div className="max-w-[2880px] items-center m-auto">
+        <div className="block  justify-between mt-[120px] items-center px-[16px] lg:px-[64px] rounded-lg">
+          <h2 className="text-[18px] lg:text-[20px] font-semibold text-gray-700">
+            Weekly Deals
+          </h2>
+        </div>
+        {allDocs.length === 0 && (
+          <div className="mt-24 lg:mt-0 flex px-6 py-2 mb-8 space-x-4 animate-pulse">
+            <div className="flex-1 py-1 space-y-6">
               <div className="h-2 rounded bg-slate-200"></div>
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="h-2 col-span-2 rounded bg-slate-200"></div>
+                  <div className="h-2 col-span-1 rounded bg-slate-200"></div>
+                  <div className="h-2 col-span-1 rounded bg-slate-200"></div>
+                  <div className="h-2 col-span-1 rounded bg-slate-200"></div>
+                  <div className="h-2 col-span-1 rounded bg-slate-200"></div>
+                  <div className="h-2 col-span-1 rounded bg-slate-200"></div>
+                  <div className="h-2 col-span-1 rounded bg-slate-200"></div>
+                  <div className="h-2 col-span-1 rounded bg-slate-200"></div>
+                  <div className="h-2 col-span-1 rounded bg-slate-200"></div>
+                </div>
+                <div className="h-2 rounded bg-slate-200"></div>
+              </div>
             </div>
           </div>
+        )}
+        <div className="mt-4 mx-[16px] b-[16px] lg:m-[64px] grid grid-cols-2 lg:grid-cols-3 gap-[16px] lg:gap-8 lg:mt-4">
+          {allDocs.map((product, index) => (
+            <ProductCard
+              key={index}
+              // image="./Manifest.jpg"
+              image={product.imageURL}
+              productName={product.productName}
+              oldPrice={product.oldPrice}
+              currentPrice={product.currentPrice}
+              availaBleQTY={product.availableQTY}
+              measurement={product.measurement}
+              endDate={product.expiryDate}
+              classExtra={"mb-2 lg:mb-2"}
+              OnClick={() => {
+                handleProductClick(product);
+              }}
+            />
+          ))}
         </div>
-      )}
-      <div className="mt-24 mx-[16px] b-[16px] md:m-[64px] grid grid-cols-2 md:grid-cols-3 gap-[16px] md:gap-8 md:mt-4">
-        {allDocs.map((product, index) => (
-          <ProductCard
-            key={index}
-            // image="./Manifest.jpg"
-            image={product.imageURL}
-            productName={product.productName}
-            oldPrice={product.oldPrice}
-            currentPrice={product.currentPrice}
-            availaBleQTY={product.availableQTY}
-            measurement={product.measurement}
-            endDate={product.expiryDate}
-            classExtra={"mb-2 md:mb-2"}
-            OnClick={() => {
-              handleProductClick(product);
-            }}
-          />
-        ))}
+        <SparkFooter />
       </div>
-
       {useDrawer && openCheckOut && (
         <Drawer
           placement="bottom"
@@ -493,7 +495,6 @@ const DealsPage = () => {
           </div>
         </Modal>
       )}
-      <SparkFooter />
     </div>
   );
 };

@@ -191,7 +191,7 @@ const AdminPage = () => {
       <Header />
       {/* Page */}
       {/* top */}
-      <div className="mx-[16px] md:mx-[64px] bg-white flex justify-between mt-4 md:mt-32 py-4 items-center px-[16px] md:px-[32px] rounded-lg">
+      <div className="mx-[16px] lg:mx-[64px] bg-white flex justify-between mt-4 lg:mt-32 py-4 items-center px-[16px] lg:px-[32px] rounded-lg">
         <h2 className="text-[24px] font-medium">Admin Page</h2>
         <div
           className={`${
@@ -219,13 +219,13 @@ const AdminPage = () => {
         <FaPlus size={18} />
       </div>
       {/* Deals and Orders Tab Group */}
-      <div className="flex justify-between items-center px-[16px] md:px-[64px] mt-4 md:mt-8 w-full">
+      <div className="flex justify-between items-center px-[16px] lg:px-[64px] mt-4 lg:mt-8 w-full">
         {" "}
         <div className="flex">
           <div
             className={`cursor-pointer ${
               activePage === "deals" && "bg-green text-white rounded-md"
-            } px-4 md:px-8 py-2 text-gray-600`}
+            } px-4 lg:px-8 py-2 text-gray-600`}
             onClick={() => {
               handlePageChange("deals");
             }}
@@ -235,7 +235,7 @@ const AdminPage = () => {
           <div
             className={`cursor-pointer ${
               activePage === "orders" && "bg-green text-white rounded-md"
-            } px-4 md:px-8 py-2 text-gray-600`}
+            } px-4 lg:px-8 py-2 text-gray-600`}
             onClick={() => {
               handlePageChange("orders");
             }}
@@ -257,7 +257,7 @@ const AdminPage = () => {
         <>
           {/* Desktop Deals View Table */}
           <div
-            className={`${useDrawer && "hidden"} px-[16px] md:px-[64px] mt-4`}
+            className={`${useDrawer && "hidden"} px-[16px] lg:px-[64px] mt-4`}
           >
             <table className="w-full text-base font-normal text-left text-white table-auto">
               <thead className="bg-black ">
@@ -419,7 +419,7 @@ const AdminPage = () => {
       {activePage === "orders" && (
         <>
           <div
-            className={`${useDrawer && "hidden"} px-[16px] md:px-[64px] mt-4`}
+            className={`${useDrawer && "hidden"} px-[16px] lg:px-[64px] mt-4`}
           >
             <table className="w-full text-base font-normal text-left text-white table-auto">
               <thead className="bg-black ">

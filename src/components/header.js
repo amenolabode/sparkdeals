@@ -54,8 +54,8 @@ export const Header = ({ noInCart, handleOpenCart }) => {
   };
 
   return (
-    <div className="fixed items-center top-0 z-50 flex flex-col w-full h-auto border-b border-[#FAFAFA]/[.20]">
-      <div className="flex md:justify-between w-full md:px-[64px] h-[88px] py-[16px] bg-white max-w-[2880px] items-center">
+    <div className="bg-white fixed items-center top-0 z-50 flex flex-col w-full h-auto border-b border-[#FAFAFA]/[.20]">
+      <div className="flex md:justify-between w-full px-[16px] lg:px-[64px] h-[88px] py-[16px] bg-white max-w-[2880px] items-center">
         {/* <HiMenu
           className="text-xl md:hidden ml-[16px]"
           onClick={() => setOpenNavBar(true)}
@@ -73,7 +73,7 @@ export const Header = ({ noInCart, handleOpenCart }) => {
           <img
             src="./assets/logo.png"
             alt=""
-            className="ml-4 md:ml-0 cursor-pointer h-[32px]"
+            className="cursor-pointer h-[32px]"
             onClick={() => {
               handleLinkClick("/");
             }}
