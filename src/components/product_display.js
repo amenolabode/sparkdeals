@@ -58,8 +58,19 @@ const ProductCard = ({
 
         <div className="text-gray-600 text-[16px] mt-4">
           {" "}
-          <div>Deal Expires in{" "}</div>
-          <CountdownTimer className="text-red-700 font-medium " endDate={endDate} />
+          <div>Deal Expires in </div>
+          {endDate === "0 days 0 hours 0 minutes 0 seconds" && (
+            <div className="mt-2 text-red-900 font-semibold bg-red-100 border-red-200 border px-4 py-1 rounded-md w-fit">
+              Expired
+            </div>
+          )}
+          {endDate !== "0 days 0 hours 0 minutes 0 seconds" && (
+            <CountdownTimer
+            className="text-red-700 font-medium "
+            endDate={endDate}
+          />
+          )}
+          
         </div>
       </div>
     </div>
