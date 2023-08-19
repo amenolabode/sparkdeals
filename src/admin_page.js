@@ -57,6 +57,9 @@ const AdminPage = () => {
 
   const handleOkAndCancel = () => {
     setOpenModal("");
+    setLoading(false);
+    setMenuToggle("");
+    setMenuVisible(false);
     setModalVisible(false);
   };
 
@@ -74,8 +77,8 @@ const AdminPage = () => {
   };
 
   // Firebase  GET Functions
-  const orderDocs = useFetchData(openModal,  "orders");
-  const allDocs = useFetchData(openModal, "deals");
+  const orderDocs = useFetchData(loading, "orders");
+  const allDocs = useFetchData(loading, "deals");
 
   // Firebase POST Functions Start
   const handleConfirmDelete = async () => {

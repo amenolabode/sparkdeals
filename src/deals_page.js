@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/product_display";
 import { Modal, Input, Drawer } from "antd";
-import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
+import { FaMinusCircle, FaPlusCircle, FaXRay } from "react-icons/fa";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import emailjs from "@emailjs/browser";
 import Lottie from "lottie-react";
@@ -133,7 +133,7 @@ const DealsPage = () => {
     setLoading(true);
     const isSuccess = await handleProcessingOrder(newOrder);
     if (isSuccess) {
-      console.log(isSuccess)
+      console.log(isSuccess);
       setSelectedProducts([]);
       setAddress("");
       setEmail("");
@@ -143,7 +143,7 @@ const DealsPage = () => {
       setSuccess(true);
       setLoading(false);
       setModalView("");
-      // submitEmailHandler(newOrder);
+      submitEmailHandler(newOrder);
       clearCart();
     }
   };
@@ -179,8 +179,6 @@ const DealsPage = () => {
     };
   }, [screenWidth]);
 
- 
-
   const displayCart = () => {
     return (
       <div>
@@ -195,8 +193,15 @@ const DealsPage = () => {
           {selectedProducts.map((product, index) => (
             <div
               key={index}
-              className="flex items-center mt-3 bg-gray-100 rounded-lg px-4 py-2"
+              className="relative flex items-center mt-3 bg-gray-100 rounded-lg px-4 py-2"
             >
+              <FaPlusCircle
+                className="md:hidden rotate-45 text-red-900 absolute top-0 right-0 -mt-2 -mr-2 cursor-pointer"
+                size={18}
+                onClick={() => {
+                  handleRemoveProduct(product.id);
+                }}
+              />
               <div className="w-full">
                 <div className="w-full text-[16px] font-medium ">
                   {product.productName}
@@ -228,7 +233,7 @@ const DealsPage = () => {
                 />
               </div>
               <p
-                className="cursor-pointer text-red-900 hover:text-red-500 text-[12px]"
+                className="hidden md:block cursor-pointer text-red-900 hover:text-red-500 text-[12px]"
                 onClick={() => {
                   handleRemoveProduct(product.id);
                 }}
@@ -355,12 +360,12 @@ const DealsPage = () => {
     );
   };
 
-   // Validation
-   const isCheckOutValid =
-   userAddress !== "" &&
-   userName !== "" &&
-   userPhone !== "" &&
-   selectedProducts.length !== 0;
+  // Validation
+  const isCheckOutValid =
+    userAddress !== "" &&
+    userName !== "" &&
+    userPhone !== "" &&
+    selectedProducts.length !== 0;
 
   return (
     <div className="">
