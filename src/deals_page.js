@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/product_display";
 import { Modal, Input, Drawer } from "antd";
-import { FaMinusCircle, FaPlusCircle,  } from "react-icons/fa";
+import { FaCheck, FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import Lottie from "lottie-react";
 import animationData from "./assets/animation_lldyxh5j.json";
 import animationData2 from "./assets/animation_lle1e0mt.json";
@@ -10,6 +10,8 @@ import SparkFooter from "./components/footer";
 import { setCookie } from "./utils/local_storage";
 import { handleProcessingOrder, useFetchData } from "./utils/init_firebase";
 import { sendEmail } from "./utils/send_email";
+import { environment } from "./utils/testvar";
+import LoadingAnimation from "./components/loading_animation";
 
 const DealsPage = () => {
   const [openCheckOut, setOpenCheckOut] = useState(false);
@@ -19,10 +21,15 @@ const DealsPage = () => {
   const [userPhone, setPhone] = useState("");
   const [userEmail, setEmail] = useState("");
   const [userAddress, setAddress] = useState("");
+  const [couponCode, setCouponCode] = useState("");
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [useDrawer, setUseDrawer] = useState(false);
+  const [less360, setLess360] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [couponVisible, setCouponVisible] = useState(false);
+  const [couponValid, setCouponValid] = useState(false);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const paid = false;
   const delivered = false;
 
@@ -58,9 +65,9 @@ const DealsPage = () => {
         userPhone,
         userAddress
       );
-      console.log("Email sent successfully!");
+
     } catch (error) {
-      console.log("Error sending email:", error);
+
     }
   };
 
@@ -68,7 +75,15 @@ const DealsPage = () => {
     setSelectedProducts((prevProducts) =>
       prevProducts.filter((product) => product.id !== productId)
     );
+
+    const updatedCart = selectedProducts.filter(
+      (product) => product.id !== productId
+    );
+
+    // Save updated cart data to localStorage
+    setCookie("cart", updatedCart);
   };
+
 
   const handleOkAndCancel = () => {
     setOpenCheckOut(false);
@@ -112,14 +127,18 @@ const DealsPage = () => {
     });
   };
 
+  const discountCalc = discountPercent / 100
   const totalValue = selectedProducts.reduce(
-    (total, product) => total + product.value * product.currentPrice,
+    (total, product) => (total + product.value * product.currentPrice),
     0
   );
+  const discountValue = totalValue * discountCalc
+  const discountedValue = totalValue - discountValue
+
 
   const handleProcessOrder = async () => {
     const newOrder = {
-      totalValue,
+      discountedValue,
       selectedProducts,
       userName,
       userEmail,
@@ -127,11 +146,11 @@ const DealsPage = () => {
       userAddress,
       paid,
       delivered,
+      couponCode
     };
     setLoading(true);
     const isSuccess = await handleProcessingOrder(newOrder);
     if (isSuccess) {
-      console.log(isSuccess);
       setSelectedProducts([]);
       setAddress("");
       setEmail("");
@@ -141,12 +160,38 @@ const DealsPage = () => {
       setSuccess(true);
       setLoading(false);
       setModalView("");
-      submitEmailHandler(newOrder);
+      {
+        environment === "production" && submitEmailHandler(newOrder);
+      }
       clearCart();
     }
   };
 
   const allDocs = useFetchData(modalView, "deals");
+  const allCouponCodes = useFetchData(couponVisible, "coupons");
+
+  useEffect(() => {
+    const validCoupon = () => {
+      const matchingCoupon = allCouponCodes.find(
+        (coupon) => coupon.couponCode === couponCode
+      );
+
+      if (matchingCoupon) {
+
+        setCouponValid(true);
+        // console.log(matchingCoupon.id)
+        // console.log(matchingCoupon.holderName)
+        // console.log(matchingCoupon.discountPercent)
+        setDiscountPercent(matchingCoupon.discountPercent)
+      } else {
+        setCouponValid(false);
+      }
+    };
+
+    if (couponCode) {
+      validCoupon();
+    }
+  }, [couponCode, allCouponCodes]);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
@@ -169,6 +214,11 @@ const DealsPage = () => {
       setUseDrawer(true);
     } else {
       setUseDrawer(false);
+    }
+    if (screenWidth < 300) {
+      setLess360(true);
+    } else {
+      setLess360(false);
     }
 
     window.addEventListener("resize", handleResize);
@@ -250,9 +300,8 @@ const DealsPage = () => {
             : "Add More Items"}
         </div>
         <div
-          className={`${
-            selectedProducts.length === 0 && "hidden"
-          } text-[16px] w-full text-center cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] text-whitepx-8 py-4 rounded-md text-white`}
+          className={`${selectedProducts.length === 0 && "hidden"
+            } text-[16px] w-full text-center cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] text-whitepx-8 py-4 rounded-md text-white`}
           onClick={() => {
             selectedProducts.length !== 0
               ? setModalView("checkOut")
@@ -268,27 +317,37 @@ const DealsPage = () => {
 
   const displayCheckout = () => {
     return (
-      <div classNFme="">
+      <div className="h-[78vh] overflow-y-scroll no-scrollbar">
         {selectedProducts.length > 0 && (
-          <div>
+          <div className="">
             {selectedProducts.map((product, index) => (
               <div
                 key={index}
-                className="flex text-gray-600 justify-between items-center mb-4 border-b pb-4"
+                className="flex text-gray-600 justify-between items-center  border-b-2 py-4"
               >
-                <p>{product.productName}</p>
+                <p className="w-1/3 ">{product.productName}</p>
                 <p>
                   {product.value} {product.measurement}
                 </p>
-                <p>GH₵ {product.currentPrice * product.value}</p>
+                <p>GH₵ {(product.currentPrice * product.value)} </p>
               </div>
             ))}
           </div>
         )}
-        <div className="font-medium flex justify-between items-center mb-4 border-b pb-4">
-          <p>Total</p>
+        {couponVisible && <div><div className="border-b-2 mt-1 mb-2"></div>
+          <div className="font-medium flex justify-between items-center mb-4 border-b pb-4">
+            <p>Sub Total</p>
 
-          <p>GH₵ {totalValue}</p>
+            <p>GH₵ {totalValue}</p>
+          </div>
+          <div className="font-medium flex justify-between items-center mb-4 border-b pb-4">
+            <p>Discount</p>
+            <div className="flex items-center gap-4">{couponValid && <div className="text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-1 rounded-md flex items-center gap-4"> {discountPercent}% Coupon Applied</div>}
+              <p>GH₵ {discountValue}</p></div>
+          </div></div>}
+        <div className={`${!couponVisible && "mt-4"} font-medium flex justify-between items-center mb-4 border-b pb-4`}>
+          <p>Total</p>
+          <p>GH₵ {discountedValue}</p>
         </div>
 
         <h2 className="mt-8 font-medium">Please Enter your Details</h2>
@@ -341,12 +400,41 @@ const DealsPage = () => {
           />
         </div>
 
+        {!couponVisible && (
+          <div
+            className="text-green mt-4 cursor-pointer"
+            onClick={() => {
+              setCouponVisible(true);
+
+            }}
+          >
+            I have a discount code
+          </div>
+        )}
+        {couponVisible && (
+          <div className="mt-4">
+            <div className="mb-1">
+              <label className="text-gray-500"> Coupon Code </label>
+
+            </div>
+            <div className="relative flex">
+              <Input
+                className="w-full h-[48px] hover:border-green-500 active:border-green-600"
+                placeholder="Enter Coupon Code"
+                value={couponCode}
+                required={true}
+                onChange={(e) => { setCouponCode(e.target.value) }}
+              />
+              {couponValid && <div className="absolute right-2 top-2 text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-1 rounded-md flex items-center gap-4"><FaCheck className="text-green" /> </div>}
+            </div>
+          </div>
+        )}
+
         <div
-          className={`${
-            isCheckOutValid
-              ? "bg-green hover:bg-[#0f5c2e] text-white"
-              : "bg-gray-200 text-gray-500"
-          } text-[16px] w-full text-center cursor-pointer mt-8 capitalize px-8 py-4 rounded-md`}
+          className={`${isCheckOutValid
+            ? "bg-green hover:bg-[#0f5c2e] text-white"
+            : "bg-gray-200 text-gray-500"
+            } text-[16px] w-full text-center cursor-pointer mt-8 capitalize px-8 py-4 rounded-md`}
           onClick={() => {
             isCheckOutValid && handleProcessOrder();
           }}
@@ -371,51 +459,35 @@ const DealsPage = () => {
         noInCart={selectedProducts.length}
         handleOpenCart={() => setOpenCheckOut(true)}
       />
-      <div className="hidden md:block mx-[16px] md:mx-[64px]  justify-between mt-24 md:mt-[120px] items-center px-[16px] md:px-[0px] rounded-lg">
-        <h2 className="text-[18px] md:text-[20px] font-semibold text-gray-700">
-           Weekly Deals
-        </h2>
-      </div>
-      {allDocs.length === 0 && (
-        <div className="mt-24 md:mt-0 flex px-6 py-2 mb-8 space-x-4 animate-pulse">
-          <div className="flex-1 py-1 space-y-6">
-            <div className="h-2 rounded bg-slate-200"></div>
-            <div className="space-y-3">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="h-2 col-span-2 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-                <div className="h-2 col-span-1 rounded bg-slate-200"></div>
-              </div>
-              <div className="h-2 rounded bg-slate-200"></div>
-            </div>
-          </div>
+      <div className="min-h-[70vh]">
+        <div className="hidden md:block mx-[16px] md:mx-[64px]  justify-between mt-24 md:mt-[120px] items-center px-[16px] md:px-[0px] rounded-lg">
+          <h2 className="text-[18px] md:text-[20px] font-semibold text-gray-700">
+            Weekly Deals
+          </h2>
         </div>
-      )}
-      <div className="mt-24 mx-[16px] b-[16px] md:m-[64px] grid grid-cols-2 md:grid-cols-3 gap-[16px] md:gap-8 md:mt-4">
-        {allDocs.map((product, index) => (
-          <ProductCard
-            key={index}
-            // image="./Manifest.jpg"
-            image={product.imageURL}
-            productName={product.productName}
-            oldPrice={product.oldPrice}
-            currentPrice={product.currentPrice}
-            availaBleQTY={product.availableQTY}
-            measurement={product.measurement}
-            endDate={product.expiryDate}
-            classExtra={"mb-2 md:mb-2"}
-            OnClick={() => {
-              handleProductClick(product);
-            }}
-          />
-        ))}
+        {allDocs.length === 0 && (
+          <LoadingAnimation />
+        )}
+        <div className={`mt-28 mx-[16px] b-[16px] md:m-[64px] grid ${less360 ? " grid-cols-1" : " grid-cols-2"} md:grid-cols-3 gap-[16px] md:gap-8 md:mt-4`}>
+          {allDocs.map((product, index) => (
+            <ProductCard
+              key={index}
+              image={product.imageURL}
+              productName={product.productName}
+              oldPrice={product.oldPrice}
+              currentPrice={product.currentPrice}
+              availaBleQTY={product.availableQTY}
+              measurement={product.measurement}
+              endDate={product.expiryDate}
+              classExtra={"mb-2 md:mb-2"}
+              OnClick={() => {
+                handleProductClick(product);
+              }}
+            />
+          ))}
+        </div>
       </div>
+
 
       {useDrawer && openCheckOut && (
         <Drawer
@@ -446,6 +518,7 @@ const DealsPage = () => {
           centered={true}
           footer={false}
           closable={true}
+
           title={
             <div className="text-[24px]">
               {modalView === "cart" && "Your Cart"}

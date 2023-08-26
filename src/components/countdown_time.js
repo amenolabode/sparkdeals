@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const CountdownTimer = ({ endDate, className }) => {
+const CountdownTimer = ({ endDate, className, onCountdownFinished }) => {
   const calculateTimeLeft = () => {
     const currentTime = new Date();
     const endTime = new Date(endDate);
@@ -12,6 +12,7 @@ const CountdownTimer = ({ endDate, className }) => {
         hours: 0,
         minutes: 0,
         seconds: 0,
+        finished: true,
       };
     }
 
@@ -25,6 +26,7 @@ const CountdownTimer = ({ endDate, className }) => {
       hours,
       minutes,
       seconds,
+      finished: false,
     };
   };
 
@@ -32,17 +34,31 @@ const CountdownTimer = ({ endDate, className }) => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      const updatedTimeLeft = calculateTimeLeft();
+      setTimeLeft(updatedTimeLeft);
+
+      if (updatedTimeLeft.finished) {
+        clearInterval(timer);
+        if (onCountdownFinished) {
+          onCountdownFinished();
+        }
+      }
     }, 1000);
 
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [onCountdownFinished]);
 
   return (
     <div className={className}>
-      {timeLeft.days} days {timeLeft.hours} hours {timeLeft.minutes} minutes {timeLeft.seconds} seconds
+      {timeLeft.finished ? (
+        <div className='mt-2 text-red-900 font-semibold bg-red-100 border-red-200 border px-4 py-1 rounded-md w-fit'>Expired</div>
+      ) : (
+        <>
+          {timeLeft.days} days {timeLeft.hours} hours {timeLeft.minutes} minutes {timeLeft.seconds} seconds
+        </>
+      )}
     </div>
   );
 };

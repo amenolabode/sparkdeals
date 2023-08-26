@@ -64,7 +64,9 @@ const SparkFooter = () => {
           />
         </div>
       </div>
-      <div className="w-[90%] md:w-1/3 mt-12 text-gray-700 mb-24 md:mb-0">
+      <div className="mt-6">Spark Support: 0201470158 <br></br>
+        Location: Kukun, 14 Koi St, Osu, Accra</div>
+      <div className="w-[90%] md:w-1/3 mt-6 text-gray-700 mb-24 md:mb-0">
         Use of this Website implies an acceptance of our{" "}
         <a href="https://www.joinspark.app/terms/" className="text-blue-500">
           Terms of Use
