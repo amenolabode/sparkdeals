@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
-import ProductCard from "./components/product_display";
+import ProductCard from "./components/User/product_display";
 import { Modal, Input, Drawer } from "antd";
 import { FaCheck, FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import Lottie from "lottie-react";
@@ -8,7 +8,7 @@ import animationData from "./assets/animation_lldyxh5j.json";
 import animationData2 from "./assets/animation_lle1e0mt.json";
 import SparkFooter from "./components/footer";
 import { setCookie } from "./utils/local_storage";
-import { handleProcessingOrder, useFetchData } from "./utils/init_firebase";
+import { handleProcessingOrder, useFetchData } from "./utils/firebase_config";
 import { sendEmail } from "./utils/send_email";
 import { environment } from "./utils/testvar";
 import LoadingAnimation from "./components/loading_animation";

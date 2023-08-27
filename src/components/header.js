@@ -3,11 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineClose } from "react-icons/ai";
 // import { HiMenu } from "react-icons/hi";
 import { Drawer } from "antd";
+import { useAuth } from "../context/auth_context";
 
-export const Header = ({ noInCart, handleOpenCart }) => {
+export const Header = ({ noInCart, handleOpenCart, adminSignOut }) => {
   const [activePage, setActivePage] = useState("/");
   const [openNavBar, setOpenNavBar] = useState(false);
   const navigate = useNavigate();
+  const { user, signOut } = useAuth()
 
   useEffect(() => {
     const currentPath = window.location.pathname;
@@ -18,6 +20,15 @@ export const Header = ({ noInCart, handleOpenCart }) => {
     navigate(path);
     setActivePage(path);
   };
+
+  const handleLogOut = async () => {
+    try {
+      await signOut()
+      navigate('/445bde24-bbb1-47a9-82aa-c4c3fd956c14-signin')
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const MobileSideNavItems = () => {
     return (
@@ -32,9 +43,8 @@ export const Header = ({ noInCart, handleOpenCart }) => {
           <div className="flex-col items-center justify-center w-full space-y-8 text-black">
             <Link to="/" onClick={() => handleLinkClick("/")}>
               <h2
-                className={`mb-4 text-[20px] font-semibold cursor-pointer hover:text-gray-600 ${
-                  activePage === "/" ? "text-green font-medium" : "text-grey"
-                }`}
+                className={`mb-4 text-[20px] font-semibold cursor-pointer hover:text-gray-600 ${activePage === "/" ? "text-green font-medium" : "text-grey"
+                  }`}
               >
                 Home
               </h2>
@@ -83,16 +93,15 @@ export const Header = ({ noInCart, handleOpenCart }) => {
 
         <div className="flex text-black items-center space-x-8 justify-end text-[16px] font-[400]">
           <h2
-            className={`w-fit hidden md:block cursor-pointer hover:text-gray-600 ${"text-green font-medium"}`}
+            className={`${activePage === "/" ? "block" : "hidden"} w-fit cursor-pointer hover:text-gray-600 ${"text-green font-medium"}`}
           >
             <a href="https://joinspark.app">Spark Website</a>
           </h2>
 
           <Link to="/" onClick={handleOpenCart}>
             <h2
-              className={`text-green font-medium mr-[16px] md:mr-0 cursor-pointer hover:text-gray-600 flex ${
-                activePage === "/" ? "block" : "hidden"
-              }`}
+              className={`text-green font-medium mr-[16px] md:mr-0 cursor-pointer hover:text-gray-600 flex ${activePage === "/" ? "block" : "hidden"
+                }`}
             >
               Cart{" "}
               <div className="ml-2 px-[6px] text-[10px] h-4 w-4 text-center items-center flex justify-center bg-red-900 text-white rounded-[40px]">
@@ -100,6 +109,18 @@ export const Header = ({ noInCart, handleOpenCart }) => {
               </div>
             </h2>
           </Link>
+          <h3 className="text-green font-medium">{user && user.email}</h3>
+
+          <h2
+            onClick={handleLogOut}
+            className={`text-green font-medium mr-[16px] md:mr-0 cursor-pointer hover:text-gray-600 flex ${activePage === "/445bde24-bbb1-47a9-82aa-c4c3fd956c14" ? "block" : "hidden"
+              }`}
+          >
+
+            SignOut{" "}
+
+          </h2>
+
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { arrayUnion, getFirestore, query, where } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth"
 import {
   addDoc,
   serverTimestamp,
@@ -27,7 +28,7 @@ const firebaseConfig = {
 };
 
 const firebaseTestConfig = {
-  apiKey: process.env.FIREBASE_API_TEST_KEY,
+  apiKey: "AIzaSyB7ScFUEGEdq5rC7cBzsf--6IbomVDIWhk",
   authDomain: "sparkdealstest.firebaseapp.com",
   projectId: "sparkdealstest",
   storageBucket: "sparkdealstest.appspot.com",
@@ -38,6 +39,7 @@ const firebaseTestConfig = {
 const app = initializeApp(environment === "test" ? firebaseTestConfig : environment === "production" ? firebaseConfig : null);
 const storage = getStorage(app);
 const db = getFirestore(app);
+export const auth = getAuth(app)
 
 export const handleDeleteDoc = async (documentId) => {
   try {
@@ -212,5 +214,3 @@ export const useFetchData = (trigger, collectionName) => {
 
   return data;
 };
-
-

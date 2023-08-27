@@ -7,7 +7,7 @@ import {
   handlePaymentUpdate,
   handleSubmit,
   useFetchData,
-} from "./utils/init_firebase";
+} from "./utils/firebase_config";
 import { Modal, Drawer } from "antd";
 import {
   FaChevronCircleUp,
@@ -17,9 +17,10 @@ import {
 } from "react-icons/fa";
 import SparkFooter from "./components/footer";
 import { setCookie } from "./utils/local_storage";
-import { AddDealForm } from "./components/admin_add_deal_form";
-import { AdminAddCoupon } from "./components/admin_add_coupon";
-import ProductList from "./components/admin_mobile_coupon_list";
+import { AddDealForm } from "./components/admin/admin_add_deal_form";
+import { AdminAddCoupon } from "./components/admin/admin_add_coupon";
+import ProductList from "./components/admin/admin_mobile_coupon_list";
+// import { AuthDetails } from "./utils/firebase_config";
 
 const AdminPage = () => {
   const [productName, setProductName] = useState("");
@@ -44,6 +45,7 @@ const AdminPage = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [loading, setLoading] = useState(false);
   const discount = Math.floor(100 - (newPrice / oldPrice) * 100);
+
 
   const handleSetMenuToggle = (value) => {
     if (menuToggle === value) {
@@ -437,7 +439,7 @@ const AdminPage = () => {
                     </th>
                     <th scope="col" className="px-2 py-4 font-normal text-center">
                       Details
-                    </th>  
+                    </th>
                     <th
                       scope="col"
                       className="px-2 py-4 font-normal rounded-r-md"
