@@ -107,10 +107,10 @@ export const handleSubmit = async (
     });
 
 
-    return true; // Return true after the document is added successfully
+    return true;
   } catch (error) {
-    console.error("Error submitting deal:", error);
-    return false; // Return false in case of an error
+    
+    return false;
   }
 };
 
@@ -133,7 +133,7 @@ export const createCouponHandler = async (
     });
     return true; // Return true after the document is added successfully
   } catch (error) {
-    console.error("Error submitting deal:", error);
+  
     return false; // Return false in case of an error
   }
 };
@@ -164,8 +164,7 @@ export const handleProcessingOrder = async (newOrder) => {
 
     return true;
   } catch (error) {
-    // Handle error
-    console.error("Error processing order: ", error);
+    
     return false;
   }
 };

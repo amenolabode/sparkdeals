@@ -24,7 +24,7 @@ export const AuthContextProvider = ({ children }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-            console.log(currentUser)
+
         });
 
         return () => {
@@ -35,12 +35,11 @@ export const AuthContextProvider = ({ children }) => {
     const signIn = async (email, password) => {
 
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            console.log(userCredential);
+            await signInWithEmailAndPassword(auth, email, password);
+
 
         } catch (error) {
             setError(error)
-            console.error("Error signing in:", error);
         }
     };
 
@@ -48,9 +47,8 @@ export const AuthContextProvider = ({ children }) => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await sendEmailVerification(userCredential.user);
-            
         } catch (error) {
-            console.error("Error signing up:", error);
+
         }
     };
 
@@ -59,7 +57,6 @@ export const AuthContextProvider = ({ children }) => {
             await signOut(auth);
         } catch (error) {
             setError(error)
-            console.error("Error signing out:", error);
         }
     };
 

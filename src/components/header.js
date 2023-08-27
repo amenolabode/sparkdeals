@@ -26,7 +26,7 @@ export const Header = ({ noInCart, handleOpenCart, adminSignOut }) => {
       await signOut()
       navigate('/445bde24-bbb1-47a9-82aa-c4c3fd956c14-signin')
     } catch (error) {
-      console.log(error)
+      
     }
   }
 

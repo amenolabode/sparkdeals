@@ -57,13 +57,13 @@ const SignIn = () => {
           required={true}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <h3
+        {/* <h3
           onClick={
             handleRegister
           }
           className="w-full place-content-end cursor-pointer flex text-[13px] text-green font-medium mt-2">
           Don't have an account?
-        </h3>
+        </h3> */}
         <SparkButton
           className={"mt-4 w-full"}
           isButtonValid={true}

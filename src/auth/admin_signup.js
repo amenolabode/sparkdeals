@@ -27,8 +27,8 @@ const SignUp = () => {
         alt="" />
       <div className=" bg-white p-12 rounded-lg w-1/2 mx-auto flex flex-col gap-3">
         <div>
-          <h3 className="text-[24px] font-medium mb-1">Admin Login</h3>
-          <h3 className="text-[16px] text-gray-500 mb-4">Please login with your admin credentials to continue</h3>
+          <h3 className="text-[24px] font-medium mb-1">Admin Signup</h3>
+          <h3 className="text-[16px] text-gray-500 mb-4">Please create an account to continue</h3>
         </div>
         <Input
           className="w-full h-[48px] hover:border-green-500 active:border-green-600"
