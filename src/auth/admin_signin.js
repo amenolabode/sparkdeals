@@ -26,10 +26,10 @@ const SignIn = () => {
   return (
     <div className="flex flex-col h-screen items-center justify-center w-full">
       <img
-        className="h-12 mb-10"
+        className="h-8 md:h-12 mb-10"
         src="./assets/logo.png"
         alt="" />
-      <div className=" bg-white p-12 rounded-lg w-1/2 mx-auto flex flex-col gap-3">
+      <div className=" bg-white p-4 md:p-12 rounded-lg w-5/6 md:w-1/2 mx-auto flex flex-col gap-3">
         <div>
           <h3 className="text-[24px] font-semibold mb-2">Admin Login</h3>
           <h3 className="text-[16px] text-gray-500 mb-4">Please login with your admin credentials to continue</h3>

@@ -79,7 +79,7 @@ const SparkFooter = () => {
           {" "}
           Privacy Policy
         </a>
-        . Spark is a service of FiClub Ghana Ltd. :copyright: 2023 FiClub Ghana
+        . Spark is a service of FiClub Ghana Ltd. ©️ 2023 FiClub Ghana
         Ltd
       </div>
     </div>

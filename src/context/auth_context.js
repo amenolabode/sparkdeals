@@ -17,14 +17,24 @@ import { auth } from "../utils/firebase_config";
 
 const UserContext = createContext();
 
+const loadUserFromLocalStorage = () => {
+    const userJSON = localStorage.getItem("user");
+    return userJSON ? JSON.parse(userJSON) : null;
+};
+
+const saveUserToLocalStorage = (user) => {
+    const userJSON = JSON.stringify(user);
+    localStorage.setItem("user", userJSON);
+};
+
 export const AuthContextProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(loadUserFromLocalStorage());
     const [error, setError] = useState("")
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-
+            saveUserToLocalStorage(currentUser);
         });
 
         return () => {
