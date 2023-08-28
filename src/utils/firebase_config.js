@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { arrayUnion, getFirestore, query, where } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth"
+import { getAuth } from "firebase/auth"
 import {
   addDoc,
   serverTimestamp,
@@ -15,10 +15,11 @@ import {
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { useEffect, useState } from "react";
-import { environment } from "./testvar";
+import { environment } from "./environment";
+import { FIREBASE_API, FIREBASE_TEST } from "../apikey";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
+  apiKey: FIREBASE_API,
   authDomain: "sparkdeals-a9107.firebaseapp.com",
   projectId: "sparkdeals-a9107",
   storageBucket: "sparkdeals-a9107.appspot.com",
@@ -28,7 +29,7 @@ const firebaseConfig = {
 };
 
 const firebaseTestConfig = {
-  apiKey: "AIzaSyB7ScFUEGEdq5rC7cBzsf--6IbomVDIWhk",
+  apiKey: FIREBASE_TEST,
   authDomain: "sparkdealstest.firebaseapp.com",
   projectId: "sparkdealstest",
   storageBucket: "sparkdealstest.appspot.com",
@@ -36,7 +37,13 @@ const firebaseTestConfig = {
   appId: "1:753257719948:web:df98018f7e900f503073a9",
   measurementId: "G-F5HZN2FWCT"
 }
-const app = initializeApp(environment === "test" ? firebaseTestConfig : environment === "production" ? firebaseConfig : null);
+const appConfig = environment === "test" ? firebaseTestConfig : environment === "production" ? firebaseConfig : null;
+
+if (!appConfig) {
+    throw new Error("Invalid environment or missing Firebase configuration.");
+}
+
+const app = initializeApp(appConfig);
 const storage = getStorage(app);
 const db = getFirestore(app);
 export const auth = getAuth(app)
@@ -47,7 +54,7 @@ export const handleDeleteDoc = async (documentId) => {
     await deleteDoc(documentRef);
     return true;
   } catch (error) {
-    return "Error deleting document", error;
+    return
   }
 };
 

@@ -10,7 +10,7 @@ import SparkFooter from "./components/footer";
 import { setCookie } from "./utils/local_storage";
 import { handleProcessingOrder, useFetchData } from "./utils/firebase_config";
 import { sendEmail } from "./utils/send_email";
-import { environment } from "./utils/testvar";
+import { environment } from "./utils/environment";
 import LoadingAnimation from "./components/loading_animation";
 
 const DealsPage = () => {
@@ -160,8 +160,8 @@ const DealsPage = () => {
       setSuccess(true);
       setLoading(false);
       setModalView("");
-      {
-        environment === "production" && submitEmailHandler(newOrder);
+      if (environment === "production") {
+        submitEmailHandler(newOrder);
       }
       clearCart();
     }

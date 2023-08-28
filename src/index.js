@@ -1,3 +1,4 @@
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -11,6 +12,7 @@ import SignIn from "./auth/admin_signin";
 import { AuthContextProvider } from "./context/auth_context";
 import ProtectedRoutes from "./components/protected_routes";
 import SignUp from "./auth/admin_signup";
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
