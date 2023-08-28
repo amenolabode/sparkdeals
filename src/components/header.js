@@ -83,7 +83,7 @@ export const Header = ({ noInCart, handleOpenCart }) => {
             </div>}
           {activePage === "/445bde24-bbb1-47a9-82aa-c4c3fd956c14" &&
             <div
-              className="relative pr-[16px] flex items-center gap-2"
+              className="relative pr-[16px] flex md:hidden items-center gap-2"
               onClick={() => { setOpen(!open) }}>
               <FaCaretDown />
               <div className="bg-green text-white rounded-full p-2"><FaUser /></div>
