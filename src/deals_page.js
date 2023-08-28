@@ -566,6 +566,7 @@ const DealsPage = () => {
           </div>
         </Modal>
       )}
+      <SparkFooter />
     </div>
   );
 };
