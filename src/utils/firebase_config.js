@@ -16,10 +16,9 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { useEffect, useState } from "react";
 import { environment } from "./environment";
-import { FIREBASE_API, FIREBASE_TEST } from "../apikey";
 
 const firebaseConfig = {
-  apiKey: FIREBASE_API,
+  apiKey: process.env.REACT_APP_FIREBASE_API,
   authDomain: "sparkdeals-a9107.firebaseapp.com",
   projectId: "sparkdeals-a9107",
   storageBucket: "sparkdeals-a9107.appspot.com",
@@ -29,7 +28,7 @@ const firebaseConfig = {
 };
 
 const firebaseTestConfig = {
-  apiKey: FIREBASE_TEST,
+  apiKey: process.env.REACT_APP_FIREBASE_TEST,
   authDomain: "sparkdealstest.firebaseapp.com",
   projectId: "sparkdealstest",
   storageBucket: "sparkdealstest.appspot.com",
