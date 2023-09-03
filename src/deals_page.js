@@ -104,6 +104,10 @@ const DealsPage = () => {
     });
   };
 
+  const handleCheckout = () => {
+    checkCartValue && setModalView("checkOut")
+  };
+
   const addItem = (index, quantity) => {
     setSelectedProducts((prevProducts) => {
       const updatedProducts = [...prevProducts];
@@ -205,6 +209,8 @@ const DealsPage = () => {
     localStorage.removeItem("cart");
   };
 
+  const checkCartValue = totalValue >= 500
+
   useEffect(() => {
     function handleResize() {
       setScreenWidth(window.innerWidth);
@@ -299,12 +305,13 @@ const DealsPage = () => {
             ? "Add an item to cart"
             : "Add More Items"}
         </div>
+        {!checkCartValue && <div className="mt-8 text-center text-red-500">Minimum Checkout Quantity is GH₵500</div>}
         <div
           className={`${selectedProducts.length === 0 && "hidden"
-            } text-[16px] w-full text-center cursor-pointer mt-8 capitalize bg-green hover:bg-[#0f5c2e] text-whitepx-8 py-4 rounded-md text-white`}
+            } ${checkCartValue ? "mt-8 bg-green hover:bg-[#0f5c2e] text-white" : "bg-gray-200 text-gray-60"} text-[16px] w-full text-center cursor-pointer mt-2 capitalize px-8 py-4 rounded-md `}
           onClick={() => {
             selectedProducts.length !== 0
-              ? setModalView("checkOut")
+              ? handleCheckout()
               : alert("Please add an item to continue");
           }}
         >
@@ -317,7 +324,7 @@ const DealsPage = () => {
 
   const displayCheckout = () => {
     return (
-      <div className="h-[78vh] overflow-y-scroll no-scrollbar">
+      <div className="max-h-[78vh] overflow-y-scroll no-scrollbar">
         {selectedProducts.length > 0 && (
           <div className="">
             {selectedProducts.map((product, index) => (
@@ -343,7 +350,7 @@ const DealsPage = () => {
           <div className="font-medium flex justify-between items-center mb-4 border-b pb-4">
             <p>Discount</p>
             <div className="flex items-center gap-4">{couponValid && <div className="text-[#327531] border border-[#A4FF8D] bg-[#CAFFC1] px-4 py-1 rounded-md flex items-center gap-4"> {discountPercent}% Coupon Applied</div>}
-              <p>GH₵ {discountValue}</p></div>
+              <p>GH₵ {Math.floor(discountValue)}</p></div>
           </div></div>}
         <div className={`${!couponVisible && "mt-4"} font-medium flex justify-between items-center mb-4 border-b pb-4`}>
           <p>Total</p>
