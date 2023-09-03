@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import ProductCard from "./components/User/product_display";
 import { Modal, Input, Drawer } from "antd";
-import { FaCheck, FaMinusCircle, FaPlusCircle } from "react-icons/fa";
+import { FaCheck, FaMinusCircle, FaPlusCircle, FaTimes } from "react-icons/fa";
 import Lottie from "lottie-react";
 import animationData from "./assets/animation_lldyxh5j.json";
 import animationData2 from "./assets/animation_lle1e0mt.json";
@@ -30,6 +30,7 @@ const DealsPage = () => {
   const [couponVisible, setCouponVisible] = useState(false);
   const [couponValid, setCouponValid] = useState(false);
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [minQuantNotif, setminQuantNotif] = useState(true)
   const paid = false;
   const delivered = false;
 
@@ -467,10 +468,15 @@ const DealsPage = () => {
         handleOpenCart={() => setOpenCheckOut(true)}
       />
       <div className="min-h-[70vh]">
-        <div className="hidden md:block mx-[16px] md:mx-[64px]  justify-between mt-24 md:mt-[120px] items-center px-[16px] md:px-[0px] rounded-lg">
-          <h2 className="text-[18px] md:text-[20px] font-semibold text-gray-700">
+        <div className=" flex mx-[16px] md:mx-[64px] mt-24 md:mt-[120px] items-center px-[16px] md:px-[0px] rounded-lg">
+          <h2 className="text-[18px] mr-[16px] md:text-[20px] font-semibold text-gray-700">
             Weekly Deals
           </h2>
+          
+          {minQuantNotif && <div className="bg-red-100 flex px-4 py-1 rounded-md border border-red-200 text-[16px] items-center gap-2 font-base text-red-700">
+            <h2>Minimum Order Quantity is GH₵500</h2>
+            <FaTimes className="cursor-pointer" onClick={()=>{setminQuantNotif(false)}}/>
+          </div>}
         </div>
         {allDocs.length === 0 && (
           <LoadingAnimation />
@@ -481,7 +487,7 @@ const DealsPage = () => {
               key={index}
               image={product.imageURL}
               productName={product.productName}
-              oldPrice={product.oldPrice}
+              oldPrice= {product.oldPrice}
               currentPrice={product.currentPrice}
               availaBleQTY={product.availableQTY}
               measurement={product.measurement}
