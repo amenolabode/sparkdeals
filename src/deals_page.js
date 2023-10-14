@@ -30,7 +30,7 @@ const DealsPage = () => {
   const [couponVisible, setCouponVisible] = useState(false);
   const [couponValid, setCouponValid] = useState(false);
   const [discountPercent, setDiscountPercent] = useState(0);
-  const [minQuantNotif, setminQuantNotif] = useState(true)
+  // const [minQuantNotif, setminQuantNotif] = useState(true)
   const paid = false;
   const delivered = false;
 
@@ -106,7 +106,8 @@ const DealsPage = () => {
   };
 
   const handleCheckout = () => {
-    checkCartValue && setModalView("checkOut")
+    // checkCartValue && 
+    setModalView("checkOut")
   };
 
   const addItem = (index, quantity) => {
@@ -210,7 +211,7 @@ const DealsPage = () => {
     localStorage.removeItem("cart");
   };
 
-  const checkCartValue = totalValue >= 500
+  // const checkCartValue = totalValue >= 500
 
   useEffect(() => {
     function handleResize() {
@@ -306,10 +307,14 @@ const DealsPage = () => {
             ? "Add an item to cart"
             : "Add More Items"}
         </div>
-        {!checkCartValue && <div className="mt-8 text-center text-red-500">Minimum Checkout Quantity is GH₵500</div>}
+        {/* !checkCartValue && <div className="mt-8 text-center text-red-500">Minimum Checkout Quantity is GH₵500</div> */}
         <div
           className={`${selectedProducts.length === 0 && "hidden"
-            } ${checkCartValue ? "mt-8 bg-green hover:bg-[#0f5c2e] text-white" : "bg-gray-200 text-gray-60"} text-[16px] w-full text-center cursor-pointer mt-2 capitalize px-8 py-4 rounded-md `}
+            } ${
+            // checkCartValue ? 
+            "mt-8 bg-green hover:bg-[#0f5c2e] text-white"
+            // : "bg-gray-200 text-gray-60"
+            } text-[16px] w-full text-center cursor-pointer mt-2 capitalize px-8 py-4 rounded-md `}
           onClick={() => {
             selectedProducts.length !== 0
               ? handleCheckout()
@@ -468,26 +473,26 @@ const DealsPage = () => {
         handleOpenCart={() => setOpenCheckOut(true)}
       />
       <div className="min-h-[70vh]">
-        <div className=" flex mx-[16px] md:mx-[64px] mt-24 md:mt-[120px] items-center px-[16px] md:px-[0px] rounded-lg">
-          <h2 className="text-[18px] mr-[16px] md:text-[20px] font-semibold text-gray-700">
+        <div className=" flex mx-[16px] md:mx-[64px] mt-24 md:mt-[120px] items-center rounded-lg">
+          <h2 className="text-[18px] md:text-[20px] font-semibold text-gray-700">
             Weekly Deals
           </h2>
-          
-          {minQuantNotif && <div className="bg-red-100 flex px-4 py-1 rounded-md border border-red-200 text-[16px] items-center gap-2 font-base text-red-700">
+
+          {/* {minQuantNotif && <div className="bg-red-100 flex px-4 py-1 rounded-md border border-red-200 text-[16px] items-center gap-2 font-base text-red-700">
             <h2>Minimum Order Quantity is GH₵500</h2>
-            <FaTimes className="cursor-pointer" onClick={()=>{setminQuantNotif(false)}}/>
-          </div>}
+            <FaTimes className="cursor-pointer" onClick={() => { setminQuantNotif(false) }} />
+          </div>} */}
         </div>
         {allDocs.length === 0 && (
           <LoadingAnimation />
         )}
-        <div className={`mt-28 mx-[16px] b-[16px] md:m-[64px] grid ${less360 ? " grid-cols-1" : " grid-cols-2"} md:grid-cols-3 gap-[16px] md:gap-8 md:mt-4`}>
+        <div className={`mt-4 mx-[16px] b-[16px] md:m-[64px] grid ${less360 ? " grid-cols-1" : " grid-cols-2"} md:grid-cols-3 gap-[16px] md:gap-8 md:mt-4`}>
           {allDocs.map((product, index) => (
             <ProductCard
               key={index}
               image={product.imageURL}
               productName={product.productName}
-              oldPrice= {product.oldPrice}
+              oldPrice={product.oldPrice}
               currentPrice={product.currentPrice}
               availaBleQTY={product.availableQTY}
               measurement={product.measurement}
