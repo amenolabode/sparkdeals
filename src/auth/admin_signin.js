@@ -1,5 +1,5 @@
 import { Alert, Input, Space } from "antd";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import SparkButton from "../components/button";
 import { useNavigate } from "react-router-dom";
 // import { signIn, AuthDetails } from "../utils/firebase_config";
@@ -15,13 +15,10 @@ const SignIn = () => {
   const handleSignIn = async () => {
     setLoading(true)
     await signIn(email, password);
-    navigate('/445bde24-bbb1-47a9-82aa-c4c3fd956c14');
+    navigate('/');
     setLoading(false)
   };
 
-  const handleRegister = () => {
-    navigate("/445bde24-bbb1-47a9-82aa-c4c3fd956c14-register")
-  }
 
   return (
     <div className="flex flex-col h-screen items-center justify-center w-full">
