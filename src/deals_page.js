@@ -230,9 +230,9 @@ const DealsPage = () => {
 		};
 	}, [screenWidth]);
 
-	useEffect(() => {
-    analytics.logEvent()
-  }, []);
+	// useEffect(() => {
+  //   analytics.logEvent()
+  // }, []);
 
 	const displayCart = () => {
 		return (

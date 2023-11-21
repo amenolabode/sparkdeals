@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { arrayUnion, getFirestore, query, where } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInAnonymously } from "firebase/auth";
 import {
 	addDoc,
 	serverTimestamp,
@@ -16,7 +16,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { useEffect, useState } from "react";
 import { environment } from "./environment";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 const firebaseConfig = {
 	apiKey: process.env.REACT_APP_FIREBASE_API,
@@ -53,6 +53,47 @@ const storage = getStorage(app);
 const db = getFirestore(app);
 export const auth = getAuth(app);
 const analytics = getAnalytics(app);
+
+const getCurrentUserSource = async () => {
+	try {
+		await signInAnonymously(auth); // Sign in anonymously using the imported auth instance
+
+		const currentUser = auth.currentUser;
+		if (currentUser) {
+			const providerData = currentUser.providerData;
+			if (providerData && providerData.length > 0) {
+				const providerId = providerData[0].providerId;
+
+				// Mapping social media platforms to their respective provider IDs
+				const socialMediaProviders = {
+					"google.com": "google",
+					"facebook.com": "facebook",
+					"twitter.com": "twitter",
+					"github.com": "github",
+					"instagram.com": "instagram",
+				};
+
+				// Check if the provider ID corresponds to a social media platform
+				if (providerId in socialMediaProviders) {
+					console.log(providerId);
+					return socialMediaProviders[providerId];
+				} else {
+					return "direct";
+				}
+			}
+		}
+		return "unknown";
+	} catch (error) {
+		console.error("Error fetching user source:", error);
+		return "error";
+	}
+};
+
+getCurrentUserSource().then((userSource) => {
+	logEvent(analytics, "user_login", {
+		user_source: userSource,
+	});
+});
 
 export const handleDeleteDoc = async (documentId) => {
 	try {
